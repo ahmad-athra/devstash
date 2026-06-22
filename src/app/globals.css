@@ -1,2 +1,103 @@
 @import "tailwindcss";
 
+@theme {
+  --color-snippet: #3b82f6;
+  --color-prompt: #8b5cf6;
+  --color-command: #f97316;
+  --color-note: #fde047;
+  --color-file: #6b7280;
+  --color-image: #ec4899;
+  --color-link: #10b981;
+  
+  --color-primary: #3b82f6;
+  --color-sidebar-bg-dark: #0f0f12;
+  --color-main-bg-dark: #09090b;
+  --color-card-bg-dark: #161619;
+  --color-border-dark: #27272a;
+
+  /* Notion / GitHub Dark syntax highlighting design tokens */
+  --color-code-comment: #71717a;
+  --color-code-keyword: #ff7b72;
+  --color-code-string: #a5d6ff;
+  --color-code-number: #ff9e64;
+  --color-code-operator: #c9d1d9;
+  --color-code-punctuation: #8b949e;
+  --color-code-function: #d2a6ff;
+  --color-code-class-name: #79c0ff;
+  --color-code-variable: #ffa657;
+}
+
+@layer base {
+  body {
+    background-color: #09090b;
+    color: #f4f4f5;
+  }
+}
+
+/* Prism custom styles - defined globally to prevent purging of dynamic runtime classes */
+pre code {
+  color: var(--color-code-operator);
+  font-family: var(--font-mono);
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--color-code-comment);
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: var(--color-code-punctuation);
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: var(--color-code-number);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: var(--color-code-string);
+}
+
+.token.operator,
+.token.entity,
+.token.url {
+  color: var(--color-code-operator);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: var(--color-code-keyword);
+}
+
+.token.function,
+.token.class-name {
+  color: var(--color-code-function);
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: var(--color-code-variable);
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}

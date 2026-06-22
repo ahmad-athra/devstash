@@ -1,0 +1,259 @@
+'use client';
+
+import React from 'react';
+import { 
+  Folder, 
+  Star, 
+  ChevronLeft, 
+  ChevronRight, 
+  Search, 
+  Sparkles, 
+  Layers, 
+  LogOut,
+  LayoutDashboard,
+  ShieldCheck
+} from 'lucide-react';
+import { MOCK_ITEM_TYPES, MOCK_COLLECTIONS } from '@/lib/mockData';
+import { DynamicIcon } from './DynamicIcon';
+
+interface SidebarProps {
+  activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection'; value?: string };
+  setActiveFilter: (filter: { type: 'all' | 'favorites' | 'type' | 'collection'; value?: string }) => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (collapsed: boolean) => void;
+  proMode: boolean;
+  setProMode: (pro: boolean) => void;
+  mobileOpen: boolean;
+  setMobileOpen: (open: boolean) => void;
+}
+
+export default function Sidebar({
+  activeFilter,
+  setActiveFilter,
+  isCollapsed,
+  setIsCollapsed,
+  proMode,
+  setProMode,
+  mobileOpen,
+  setMobileOpen,
+}: SidebarProps) {
+  const itemTypes = Object.values(MOCK_ITEM_TYPES);
+
+  const handleFilterClick = (type: 'all' | 'favorites' | 'type' | 'collection', value?: string) => {
+    setActiveFilter({ type, value });
+    setMobileOpen(false); // Close drawer on mobile click
+  };
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-[#0f0f12] text-zinc-300 border-r border-zinc-800/80 transition-all duration-300">
+      {/* Brand Header */}
+      <div className="flex items-center justify-between p-4 border-b border-zinc-800/60 h-16">
+        <div className={`flex items-center gap-3 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
+          <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/10">
+            <Layers className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="font-bold text-base tracking-wide bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">DevStash</h1>
+            <span className="text-[10px] text-zinc-500 font-mono">v1.0.0-beta</span>
+          </div>
+        </div>
+        {/* Collapse Button (Desktop) */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden md:flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          {isCollapsed ? <ChevronRight className="h-4.5 w-4.5" /> : <ChevronLeft className="h-4.5 w-4.5" />}
+        </button>
+      </div>
+
+      {/* Pro Tier Toggle Badge / Banner */}
+      {!isCollapsed && (
+        <div className="px-4 py-3 border-b border-zinc-800/30">
+          <div 
+            onClick={() => setProMode(!proMode)}
+            className={`group flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer ${
+              proMode 
+                ? 'bg-purple-950/20 border-purple-800/60 shadow-inner' 
+                : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className={`h-4 w-4 ${proMode ? 'text-purple-400 animate-pulse' : 'text-zinc-500 group-hover:text-zinc-400'}`} />
+              <div className="text-left">
+                <p className="text-xs font-semibold text-zinc-200">DevStash Pro</p>
+                <p className="text-[10px] text-zinc-500">{proMode ? 'Enterprise Active' : 'Upgrade for $8/mo'}</p>
+              </div>
+            </div>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold tracking-wider ${
+              proMode ? 'bg-purple-500/20 text-purple-300' : 'bg-zinc-800 text-zinc-500'
+            }`}>
+              {proMode ? 'PRO' : 'FREE'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation Groups */}
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+        {/* Main Filters */}
+        <div className="space-y-1">
+          <button
+            onClick={() => handleFilterClick('all')}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeFilter.type === 'all'
+                ? 'bg-zinc-800/80 text-white font-semibold shadow-sm'
+                : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <LayoutDashboard className="h-4.5 w-4.5 text-zinc-400" />
+            {!isCollapsed && <span>Dashboard Home</span>}
+          </button>
+          
+          <button
+            onClick={() => handleFilterClick('favorites')}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeFilter.type === 'favorites'
+                ? 'bg-zinc-800/80 text-white font-semibold shadow-sm'
+                : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Star className="h-4.5 w-4.5 text-yellow-500/80 fill-yellow-500/20" />
+            {!isCollapsed && <span>Favorites</span>}
+          </button>
+        </div>
+
+        {/* Item Types */}
+        <div>
+          {!isCollapsed && (
+            <h3 className="px-3 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2">Item Types</h3>
+          )}
+          <div className="space-y-1">
+            {itemTypes.map((type) => {
+              const isSelected = activeFilter.type === 'type' && activeFilter.value === type.name;
+              
+              return (
+                <button
+                  key={type.id}
+                  onClick={() => handleFilterClick('type', type.name)}
+                  className={`group w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    isSelected
+                      ? 'bg-zinc-800/80 text-white font-semibold'
+                      : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="p-1 rounded-md transition-colors"
+                      style={{ 
+                        color: type.color, 
+                        backgroundColor: isSelected ? `${type.color}15` : 'transparent' 
+                      }}
+                    >
+                      <DynamicIcon name={type.icon} className="h-4 w-4" />
+                    </div>
+                    {!isCollapsed && <span className="capitalize">{type.name}</span>}
+                  </div>
+                  {!isCollapsed && type.proOnly && (
+                    <ShieldCheck className={`h-3.5 w-3.5 ${proMode ? 'text-purple-400' : 'text-zinc-600 group-hover:text-zinc-500'}`} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Collections */}
+        <div>
+          {!isCollapsed && (
+            <h3 className="px-3 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2">Collections</h3>
+          )}
+          <div className="space-y-1">
+            {MOCK_COLLECTIONS.map((col) => {
+              const isSelected = activeFilter.type === 'collection' && activeFilter.value === col.id;
+              // Get color of default item type for color-coding matching spec
+              const typeColor = MOCK_ITEM_TYPES[col.defaultTypeId?.replace('type-', '') || 'note']?.color || '#a1a1aa';
+              
+              return (
+                <button
+                  key={col.id}
+                  onClick={() => handleFilterClick('collection', col.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
+                    isSelected
+                      ? 'bg-zinc-800/80 text-white font-semibold'
+                      : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  <Folder 
+                    className="h-4 w-4 transition-transform group-hover:scale-110" 
+                    style={{ color: typeColor }}
+                  />
+                  {!isCollapsed && (
+                    <span className="truncate flex-1">{col.name}</span>
+                  )}
+                  {!isCollapsed && col.isFavorite && (
+                    <Star className="h-3 w-3 text-yellow-500/80 fill-yellow-500/30" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Profile Block */}
+      <div className="p-4 border-t border-zinc-800/60 bg-zinc-950/40">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-white text-sm border border-zinc-700">
+              AH
+            </div>
+            <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#0f0f12] ${proMode ? 'bg-purple-500' : 'bg-emerald-500'}`} />
+          </div>
+          
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-zinc-200 truncate">Ahmad AbuAtherah</p>
+              <p className="text-[10px] text-zinc-500 truncate">ahmad@devstash.io</p>
+            </div>
+          )}
+          
+          {!isCollapsed && (
+            <button className="text-zinc-500 hover:text-zinc-300 p-1 hover:bg-zinc-800 rounded-lg transition-colors">
+              <LogOut className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar container */}
+      <aside 
+        className={`hidden md:block shrink-0 h-screen transition-all duration-300 sticky top-0 ${
+          isCollapsed ? 'w-[72px]' : 'w-[260px]'
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer Backdrop */}
+      {mobileOpen && (
+        <div 
+          className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar drawer */}
+      <aside 
+        className={`md:hidden fixed top-0 bottom-0 left-0 z-50 w-[260px] transform transition-transform duration-300 ease-in-out ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+    </>
+  );
+}

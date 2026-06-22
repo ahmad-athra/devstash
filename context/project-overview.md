@@ -25,15 +25,15 @@
 
 Developers keep their essentials scattered across too many tools:
 
-| What                   | Where It Ends Up           |
-| ---------------------- | -------------------------- |
-| Code snippets          | VS Code, Notion, Gists    |
-| AI prompts             | ChatGPT/Claude chat logs  |
-| Context files          | Buried in project dirs     |
-| Useful links           | Browser bookmarks          |
-| Documentation          | Random folders             |
-| Terminal commands       | `.txt` files, bash history |
-| Project templates      | GitHub Gists               |
+| What              | Where It Ends Up           |
+| ----------------- | -------------------------- |
+| Code snippets     | VS Code, Notion, Gists     |
+| AI prompts        | ChatGPT/Claude chat logs   |
+| Context files     | Buried in project dirs     |
+| Useful links      | Browser bookmarks          |
+| Documentation     | Random folders             |
+| Terminal commands | `.txt` files, bash history |
+| Project templates | GitHub Gists               |
 
 **Result →** Context switching, lost knowledge, inconsistent workflows.
 
@@ -43,29 +43,29 @@ Developers keep their essentials scattered across too many tools:
 
 ## 👤 Target Users
 
-| Persona                       | Primary Use Case                                       |
-| ----------------------------- | ------------------------------------------------------ |
-| 🧑‍💻 **Everyday Developer**     | Quick access to snippets, commands, links              |
-| 🤖 **AI-First Developer**     | Saves prompts, system messages, AI contexts, workflows |
-| 🎓 **Content Creator / Educator** | Stores code blocks, explanations, course notes     |
-| 🏗️ **Full-Stack Builder**      | Collects patterns, boilerplates, API examples          |
+| Persona                           | Primary Use Case                                       |
+| --------------------------------- | ------------------------------------------------------ |
+| 🧑‍💻 **Everyday Developer**         | Quick access to snippets, commands, links              |
+| 🤖 **AI-First Developer**         | Saves prompts, system messages, AI contexts, workflows |
+| 🎓 **Content Creator / Educator** | Stores code blocks, explanations, course notes         |
+| 🏗️ **Full-Stack Builder**         | Collects patterns, boilerplates, API examples          |
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer              | Technology                                                                                                | Notes                                      |
-| ------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **Framework**      | [Next.js 16](https://nextjs.org/) / [React 19](https://react.dev/)                                       | SSR pages, API routes, single repo         |
-| **Language**       | [TypeScript](https://www.typescriptlang.org/)                                                             | Strict mode, no `any`                      |
-| **Database**       | [Neon](https://neon.tech/) (Serverless PostgreSQL)                                                        | Cloud-hosted, branching support            |
-| **ORM**            | [Prisma 7](https://www.prisma.io/)                                                                        | Migration-based workflow only              |
-| **Auth**           | [NextAuth v5 (Auth.js)](https://authjs.dev/)                                                              | Email/password + GitHub OAuth              |
-| **File Storage**   | [Cloudflare R2](https://developers.cloudflare.com/r2/)                                                   | S3-compatible, zero egress fees            |
-| **AI**             | [OpenAI](https://platform.openai.com/) — `gpt-5-nano`                                                    | Auto-tag, summarize, explain, optimize     |
-| **CSS**            | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)                        | Design tokens via CSS variables            |
-| **Caching**        | [Redis](https://redis.io/) *(future consideration)*                                                      | Session cache, distributed locking         |
-| **Payments**       | [Stripe](https://stripe.com/)                                                                             | Subscriptions (monthly / yearly)           |
+| Layer            | Technology                                                                        | Notes                                  |
+| ---------------- | --------------------------------------------------------------------------------- | -------------------------------------- |
+| **Framework**    | [Next.js 16](https://nextjs.org/) / [React 19](https://react.dev/)                | SSR pages, API routes, single repo     |
+| **Language**     | [TypeScript](https://www.typescriptlang.org/)                                     | Strict mode, no `any`                  |
+| **Database**     | [Neon](https://neon.tech/) (Serverless PostgreSQL)                                | Cloud-hosted, branching support        |
+| **ORM**          | [Prisma 7](https://www.prisma.io/)                                                | Migration-based workflow only          |
+| **Auth**         | [NextAuth v5 (Auth.js)](https://authjs.dev/)                                      | Email/password + GitHub OAuth          |
+| **File Storage** | [Cloudflare R2](https://developers.cloudflare.com/r2/)                            | S3-compatible, zero egress fees        |
+| **AI**           | [OpenAI](https://platform.openai.com/) — `gpt-5-nano`                             | Auto-tag, summarize, explain, optimize |
+| **CSS**          | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) | Design tokens via CSS variables        |
+| **Caching**      | [Redis](https://redis.io/) _(future consideration)_                               | Session cache, distributed locking     |
+| **Payments**     | [Stripe](https://stripe.com/)                                                     | Subscriptions (monthly / yearly)       |
 
 ---
 
@@ -444,9 +444,9 @@ erDiagram
 
 ### Strategy: NextAuth v5 (Auth.js)
 
-| Provider         | Flow                                                        |
-| ---------------- | ----------------------------------------------------------- |
-| **Credentials**  | Email + hashed password (bcrypt). Custom sign-up page.      |
+| Provider         | Flow                                                           |
+| ---------------- | -------------------------------------------------------------- |
+| **Credentials**  | Email + hashed password (bcrypt). Custom sign-up page.         |
 | **GitHub OAuth** | One-click sign-in. Merges with existing account if same email. |
 
 ### Auth Flow
@@ -481,15 +481,15 @@ Items are the core unit of DevStash. Each item has a **type** that determines it
 
 **System Types** (immutable, available to all users):
 
-| Type        | Content Type | Icon          | Color                 | Tier  |
-| ----------- | ------------ | ------------- | --------------------- | ----- |
-| `snippet`   | `TEXT`       | `Code`        | `#3b82f6` 🔵 Blue    | Free  |
-| `prompt`    | `TEXT`       | `Sparkles`    | `#8b5cf6` 🟣 Purple  | Free  |
-| `command`   | `TEXT`       | `Terminal`    | `#f97316` 🟠 Orange  | Free  |
-| `note`      | `TEXT`       | `StickyNote`  | `#fde047` 🟡 Yellow  | Free  |
-| `link`      | `URL`        | `Link`        | `#10b981` 🟢 Emerald | Free  |
-| `file`      | `FILE`       | `File`        | `#6b7280` ⚫ Gray    | Pro   |
-| `image`     | `FILE`       | `Image`       | `#ec4899` 🩷 Pink    | Pro   |
+| Type      | Content Type | Icon         | Color                | Tier |
+| --------- | ------------ | ------------ | -------------------- | ---- |
+| `snippet` | `TEXT`       | `Code`       | `#3b82f6` 🔵 Blue    | Free |
+| `prompt`  | `TEXT`       | `Sparkles`   | `#8b5cf6` 🟣 Purple  | Free |
+| `command` | `TEXT`       | `Terminal`   | `#f97316` 🟠 Orange  | Free |
+| `note`    | `TEXT`       | `StickyNote` | `#fde047` 🟡 Yellow  | Free |
+| `link`    | `URL`        | `Link`       | `#10b981` 🟢 Emerald | Free |
+| `file`    | `FILE`       | `File`       | `#6b7280` ⚫ Gray    | Pro  |
+| `image`   | `FILE`       | `Image`      | `#ec4899` 🩷 Pink    | Pro  |
 
 **Custom Types** (Pro, future feature): Users can create their own types with custom names, icons, and colors.
 
@@ -509,13 +509,13 @@ Flexible grouping of items across types.
 
 **Examples:**
 
-| Collection Name    | Typical Contents           |
-| ------------------ | -------------------------- |
-| React Patterns     | snippets, notes            |
-| Context Files      | files, prompts             |
-| Python Snippets    | snippets                   |
-| Interview Prep     | snippets, notes, links     |
-| Prompt Library     | prompts                    |
+| Collection Name | Typical Contents       |
+| --------------- | ---------------------- |
+| React Patterns  | snippets, notes        |
+| Context Files   | files, prompts         |
+| Python Snippets | snippets               |
+| Interview Prep  | snippets, notes, links |
+| Prompt Library  | prompts                |
 
 ---
 
@@ -534,29 +534,29 @@ Full-text search across:
 
 ### D. Additional Features
 
-| Feature                          | Description                                              | Tier      |
-| -------------------------------- | -------------------------------------------------------- | --------- |
-| ⭐ Favorites                    | Favorite collections and items for quick access          | Free      |
-| 📌 Pin to Top                   | Pin important items above the rest                       | Free      |
-| 🕐 Recently Used                | Track and surface recently accessed items                | Free      |
-| 📥 Import from File             | Upload a code file to create a snippet                   | Free      |
-| ✍️ Markdown Editor              | Rich editor for text-type items                          | Free      |
-| 📎 File Upload                  | Upload files/images to Cloudflare R2                     | Pro       |
-| 📤 Export Data                   | Export as JSON / ZIP                                     | Pro       |
-| 🌙 Dark Mode                    | Default theme, with light mode toggle                    | Free      |
-| 🔀 Multi-collection Assignment  | Add/remove items to/from multiple collections at once    | Free      |
-| 👁️ Collection Membership View   | See which collections an item belongs to                 | Free      |
+| Feature                        | Description                                           | Tier |
+| ------------------------------ | ----------------------------------------------------- | ---- |
+| ⭐ Favorites                   | Favorite collections and items for quick access       | Free |
+| 📌 Pin to Top                  | Pin important items above the rest                    | Free |
+| 🕐 Recently Used               | Track and surface recently accessed items             | Free |
+| 📥 Import from File            | Upload a code file to create a snippet                | Free |
+| ✍️ Markdown Editor             | Rich editor for text-type items                       | Free |
+| 📎 File Upload                 | Upload files/images to Cloudflare R2                  | Pro  |
+| 📤 Export Data                 | Export as JSON / ZIP                                  | Pro  |
+| 🌙 Dark Mode                   | Default theme, with light mode toggle                 | Free |
+| 🔀 Multi-collection Assignment | Add/remove items to/from multiple collections at once | Free |
+| 👁️ Collection Membership View  | See which collections an item belongs to              | Free |
 
 ---
 
 ### E. AI Features (Pro Only)
 
-| Feature                | Description                                                    | API Endpoint Pattern       |
-| ---------------------- | -------------------------------------------------------------- | -------------------------- |
-| 🏷️ Auto-Tag Suggestions | AI analyzes content and suggests relevant tags                | `POST /api/ai/auto-tag`    |
-| 📝 AI Summaries         | Generate a concise summary of long items                      | `POST /api/ai/summarize`   |
-| 🔍 Explain This Code    | AI provides a line-by-line explanation of code snippets       | `POST /api/ai/explain`     |
-| ✨ Prompt Optimizer      | Rewrites and improves AI prompts for better output            | `POST /api/ai/optimize`    |
+| Feature                 | Description                                             | API Endpoint Pattern     |
+| ----------------------- | ------------------------------------------------------- | ------------------------ |
+| 🏷️ Auto-Tag Suggestions | AI analyzes content and suggests relevant tags          | `POST /api/ai/auto-tag`  |
+| 📝 AI Summaries         | Generate a concise summary of long items                | `POST /api/ai/summarize` |
+| 🔍 Explain This Code    | AI provides a line-by-line explanation of code snippets | `POST /api/ai/explain`   |
+| ✨ Prompt Optimizer     | Rewrites and improves AI prompts for better output      | `POST /api/ai/optimize`  |
 
 **Model:** OpenAI `gpt-5-nano` — fast, cost-effective for utility tasks.
 
@@ -569,13 +569,13 @@ Full-text search across:
 ```css
 /* Item Type Color Tokens */
 :root {
-  --type-snippet-color: #3b82f6;   /* Blue   */
-  --type-prompt-color: #8b5cf6;    /* Purple */
-  --type-command-color: #f97316;   /* Orange */
-  --type-note-color: #fde047;      /* Yellow */
-  --type-file-color: #6b7280;      /* Gray   */
-  --type-image-color: #ec4899;     /* Pink   */
-  --type-link-color: #10b981;      /* Emerald */
+  --type-snippet-color: #3b82f6; /* Blue   */
+  --type-prompt-color: #8b5cf6; /* Purple */
+  --type-command-color: #f97316; /* Orange */
+  --type-note-color: #fde047; /* Yellow */
+  --type-file-color: #6b7280; /* Gray   */
+  --type-image-color: #ec4899; /* Pink   */
+  --type-link-color: #10b981; /* Emerald */
 }
 ```
 
@@ -593,64 +593,64 @@ import {
   Image,
   Link,
   type LucideIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 export interface ItemTypeConfig {
   name: string;
   icon: LucideIcon;
   color: string;
-  contentType: 'TEXT' | 'URL' | 'FILE';
+  contentType: "TEXT" | "URL" | "FILE";
   proOnly: boolean;
 }
 
 export const SYSTEM_ITEM_TYPES: Record<string, ItemTypeConfig> = {
   snippet: {
-    name: 'Snippet',
+    name: "Snippet",
     icon: Code,
-    color: '#3b82f6',
-    contentType: 'TEXT',
+    color: "#3b82f6",
+    contentType: "TEXT",
     proOnly: false,
   },
   prompt: {
-    name: 'Prompt',
+    name: "Prompt",
     icon: Sparkles,
-    color: '#8b5cf6',
-    contentType: 'TEXT',
+    color: "#8b5cf6",
+    contentType: "TEXT",
     proOnly: false,
   },
   command: {
-    name: 'Command',
+    name: "Command",
     icon: Terminal,
-    color: '#f97316',
-    contentType: 'TEXT',
+    color: "#f97316",
+    contentType: "TEXT",
     proOnly: false,
   },
   note: {
-    name: 'Note',
+    name: "Note",
     icon: StickyNote,
-    color: '#fde047',
-    contentType: 'TEXT',
+    color: "#fde047",
+    contentType: "TEXT",
     proOnly: false,
   },
   link: {
-    name: 'Link',
+    name: "Link",
     icon: Link,
-    color: '#10b981',
-    contentType: 'URL',
+    color: "#10b981",
+    contentType: "URL",
     proOnly: false,
   },
   file: {
-    name: 'File',
+    name: "File",
     icon: FileText,
-    color: '#6b7280',
-    contentType: 'FILE',
+    color: "#6b7280",
+    contentType: "FILE",
     proOnly: true,
   },
   image: {
-    name: 'Image',
+    name: "Image",
     icon: Image,
-    color: '#ec4899',
-    contentType: 'FILE',
+    color: "#ec4899",
+    contentType: "FILE",
     proOnly: true,
   },
 } as const;
@@ -713,8 +713,8 @@ export const TIER_LIMITS = {
 } as const;
 
 export const PRO_PRICING = {
-  monthly: 8_00,  // $8.00 in cents (Stripe format)
-  yearly: 72_00,  // $72.00 in cents
+  monthly: 8_00, // $8.00 in cents (Stripe format)
+  yearly: 72_00, // $72.00 in cents
 } as const;
 ```
 
@@ -749,14 +749,21 @@ sequenceDiagram
 
 ### Design Philosophy
 
-| Principle           | Detail                                                        |
-| ------------------- | ------------------------------------------------------------- |
-| **Aesthetic**       | Modern, minimal, developer-focused                            |
-| **Theme**           | Dark mode default, light mode optional                        |
-| **Typography**      | Clean, monospace for code, sans-serif for UI                  |
-| **Spacing**         | Generous whitespace, breathing room                           |
-| **Depth**           | Subtle borders and shadows, layered surfaces                  |
-| **Inspiration**     | [Notion](https://notion.so), [Linear](https://linear.app), [Raycast](https://raycast.com) |
+| Principle       | Detail                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| **Aesthetic**   | Modern, minimal, developer-focused                                                        |
+| **Theme**       | Dark mode default, light mode optional                                                    |
+| **Typography**  | Clean, monospace for code, sans-serif for UI                                              |
+| **Spacing**     | Generous whitespace, breathing room                                                       |
+| **Depth**       | Subtle borders and shadows, layered surfaces                                              |
+| **Inspiration** | [Notion](https://notion.so), [Linear](https://linear.app), [Raycast](https://raycast.com) |
+
+### Design References
+
+### Screenshots
+
+Refer to the screenshots in the below directory as a base for the dashboard UI. It does not have to be exact. Use it as a reference.
+@context/screenshots/dashboard/
 
 ### Layout Architecture
 
@@ -797,11 +804,11 @@ graph LR
 
 ### Responsive Strategy
 
-| Breakpoint       | Behavior                                        |
-| ---------------- | ----------------------------------------------- |
-| **Desktop** (≥1024px)  | Sidebar persistent + main content         |
-| **Tablet** (768–1023px) | Sidebar collapsible, overlay on toggle   |
-| **Mobile** (<768px)    | Sidebar becomes a bottom drawer / hamburger menu |
+| Breakpoint              | Behavior                                         |
+| ----------------------- | ------------------------------------------------ |
+| **Desktop** (≥1024px)   | Sidebar persistent + main content                |
+| **Tablet** (768–1023px) | Sidebar collapsible, overlay on toggle           |
+| **Mobile** (<768px)     | Sidebar becomes a bottom drawer / hamburger menu |
 
 ### Micro-Interactions
 
@@ -926,22 +933,22 @@ The following system types should be seeded on first migration:
 ```typescript
 // prisma/seed.ts
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 const SYSTEM_TYPES = [
-  { name: 'snippet', icon: 'Code',       color: '#3b82f6', isSystem: true },
-  { name: 'prompt',  icon: 'Sparkles',   color: '#8b5cf6', isSystem: true },
-  { name: 'command', icon: 'Terminal',    color: '#f97316', isSystem: true },
-  { name: 'note',    icon: 'StickyNote',  color: '#fde047', isSystem: true },
-  { name: 'link',    icon: 'Link',        color: '#10b981', isSystem: true },
-  { name: 'file',    icon: 'File',        color: '#6b7280', isSystem: true },
-  { name: 'image',   icon: 'Image',       color: '#ec4899', isSystem: true },
+  { name: "snippet", icon: "Code", color: "#3b82f6", isSystem: true },
+  { name: "prompt", icon: "Sparkles", color: "#8b5cf6", isSystem: true },
+  { name: "command", icon: "Terminal", color: "#f97316", isSystem: true },
+  { name: "note", icon: "StickyNote", color: "#fde047", isSystem: true },
+  { name: "link", icon: "Link", color: "#10b981", isSystem: true },
+  { name: "file", icon: "File", color: "#6b7280", isSystem: true },
+  { name: "image", icon: "Image", color: "#ec4899", isSystem: true },
 ];
 
 async function main() {
-  console.log('🌱 Seeding system item types...');
+  console.log("🌱 Seeding system item types...");
 
   for (const type of SYSTEM_TYPES) {
     await prisma.itemType.upsert({
@@ -953,7 +960,7 @@ async function main() {
     });
   }
 
-  console.log('✅ Seed complete.');
+  console.log("✅ Seed complete.");
 }
 
 main()
@@ -968,4 +975,4 @@ main()
 
 ---
 
-*Last updated: 2026-06-20*
+_Last updated: 2026-06-20_
