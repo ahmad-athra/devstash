@@ -28,8 +28,8 @@ interface ItemDrawerProps {
   isOpen: boolean;
   item: Item | null; // null if creating a new item
   onClose: () => void;
-  onSave: (item: Item) => void;
-  onDelete?: (id: string) => void;
+  onSave: (item: Item, onSuccess?: () => void) => void;
+  onDelete?: (id: string, onSuccess?: () => void) => void;
   proMode: boolean;
 }
 
@@ -146,8 +146,9 @@ export default function ItemDrawer({
       createdAt: item?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    onSave(updatedData);
-    onClose();
+    onSave(updatedData, () => {
+      onClose();
+    });
   };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
@@ -728,8 +729,9 @@ export default function ItemDrawer({
               <button
                 type="button"
                 onClick={() => {
-                  onDelete(item.id);
-                  onClose();
+                  onDelete(item.id, () => {
+                    onClose();
+                  });
                 }}
                 className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-400 hover:bg-red-500/10 px-3 py-2 rounded-xl transition-all"
               >

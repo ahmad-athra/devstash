@@ -39,8 +39,18 @@ export const singularToPluralType = (singular: string): string => {
 };
 
 interface ActiveFilter {
-  type: 'all' | 'favorites' | 'type' | 'collection';
+  type: 'all' | 'favorites' | 'type' | 'collection' | 'pinned' | 'collections' | 'items' | 'favorite_collections';
   value?: string;
+}
+
+export interface ConfirmDialogState {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  isDestructive?: boolean;
+  onConfirm: () => void;
 }
 
 interface DashboardContextType {
@@ -73,6 +83,11 @@ interface DashboardContextType {
   
   proMode: boolean;
   setProMode: (pro: boolean) => void;
+
+  // Confirm dialog state
+  confirmDialog: ConfirmDialogState | null;
+  showConfirm: (config: Omit<ConfirmDialogState, 'isOpen'>) => void;
+  closeConfirm: () => void;
   
   // Handlers
   handleToggleItemFavorite: (id: string, e: React.MouseEvent) => void;
@@ -80,10 +95,10 @@ interface DashboardContextType {
   handleToggleCollectionFavorite: (id: string, e: React.MouseEvent) => void;
   handleOpenNewItemDrawer: () => void;
   handleOpenItemDetailDrawer: (item: Item) => void;
-  handleSaveItem: (savedItem: Item) => void;
-  handleDeleteItem: (id: string) => void;
+  handleSaveItem: (savedItem: Item, callback?: () => void) => void;
+  handleDeleteItem: (id: string, callback?: () => void) => void;
   handleOpenNewCollectionModal: () => void;
-  handleSaveCollection: (savedCol: Collection) => void;
+  handleSaveCollection: (savedCol: Collection, callback?: () => void) => void;
   handleSelectCollectionCard: (id: string) => void;
   
   filteredItems: Item[];
@@ -115,6 +130,18 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (filterParam === 'favorites') {
       return { type: 'favorites' };
     }
+    if (filterParam === 'favorite_collections') {
+      return { type: 'favorite_collections' };
+    }
+    if (filterParam === 'pinned') {
+      return { type: 'pinned' };
+    }
+    if (filterParam === 'collections') {
+      return { type: 'collections' };
+    }
+    if (filterParam === 'items') {
+      return { type: 'items' };
+    }
     
     const collectionParam = searchParams.get('collection');
     if (collectionParam) {
@@ -138,6 +165,17 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
 
+  // Global Confirmation Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
+
+  const showConfirm = (config: Omit<ConfirmDialogState, 'isOpen'>) => {
+    setConfirmDialog({ ...config, isOpen: true });
+  };
+
+  const closeConfirm = () => {
+    setConfirmDialog(null);
+  };
+
   const setActiveFilter = (filter: ActiveFilter) => {
     setMobileOpen(false); // Close mobile drawer when selection changes
 
@@ -146,8 +184,14 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       router.push(`/items/${plural}`);
     } else if (filter.type === 'favorites') {
       router.push('/dashboard?filter=favorites');
-    } else if (filter.type === 'collection') {
-      router.push(`/dashboard?collection=${filter.value}`);
+    } else if (filter.type === 'favorite_collections') {
+      router.push('/dashboard?filter=favorite_collections');
+    } else if (filter.type === 'pinned') {
+      router.push('/dashboard?filter=pinned');
+    } else if (filter.type === 'collections') {
+      router.push('/dashboard?filter=collections');
+    } else if (filter.type === 'items') {
+      router.push('/dashboard?filter=items');
     } else {
       router.push('/dashboard');
     }
@@ -156,23 +200,59 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Favorite / Pin Toggles
   const handleToggleItemFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setItems(prev => prev.map(item => 
-      item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-    ));
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const willFav = !item.isFavorite;
+
+    showConfirm({
+      title: willFav ? 'Favorite Item' : 'Unfavorite Item',
+      message: `Are you sure you want to ${willFav ? 'add' : 'remove'} "${item.title}" ${willFav ? 'to' : 'from'} your favorites?`,
+      confirmText: willFav ? 'Favorite' : 'Unfavorite',
+      onConfirm: () => {
+        setItems(prev => prev.map(i => 
+          i.id === id ? { ...i, isFavorite: willFav } : i
+        ));
+        closeConfirm();
+      }
+    });
   };
 
   const handleToggleItemPin = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setItems(prev => prev.map(item => 
-      item.id === id ? { ...item, isPinned: !item.isPinned } : item
-    ));
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const willPin = !item.isPinned;
+
+    showConfirm({
+      title: willPin ? 'Pin Item' : 'Unpin Item',
+      message: `Are you sure you want to ${willPin ? 'pin' : 'unpin'} the item "${item.title}"?`,
+      confirmText: willPin ? 'Pin' : 'Unpin',
+      onConfirm: () => {
+        setItems(prev => prev.map(i => 
+          i.id === id ? { ...i, isPinned: willPin } : i
+        ));
+        closeConfirm();
+      }
+    });
   };
 
   const handleToggleCollectionFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setCollections(prev => prev.map(col => 
-      col.id === id ? { ...col, isFavorite: !col.isFavorite } : col
-    ));
+    const col = collections.find(c => c.id === id);
+    if (!col) return;
+    const willFav = !col.isFavorite;
+
+    showConfirm({
+      title: willFav ? 'Favorite Collection' : 'Unfavorite Collection',
+      message: `Are you sure you want to ${willFav ? 'add' : 'remove'} "${col.name}" ${willFav ? 'to' : 'from'} your favorite collections list?`,
+      confirmText: willFav ? 'Favorite' : 'Unfavorite',
+      onConfirm: () => {
+        setCollections(prev => prev.map(c => 
+          c.id === id ? { ...c, isFavorite: willFav } : c
+        ));
+        closeConfirm();
+      }
+    });
   };
 
   // Item Drawer Actions
@@ -186,52 +266,79 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsDrawerOpen(true);
   };
 
-  const handleSaveItem = (savedItem: Item) => {
-    setItems(prev => {
-      const exists = prev.some(item => item.id === savedItem.id);
-      if (exists) {
-        return prev.map(item => item.id === savedItem.id ? savedItem : item);
-      } else {
-        return [savedItem, ...prev];
+  const handleSaveItem = (savedItem: Item, callback?: () => void) => {
+    const isNew = !items.some(item => item.id === savedItem.id);
+
+    showConfirm({
+      title: isNew ? 'Create Item' : 'Save Changes',
+      message: isNew 
+        ? `Are you sure you want to create and save "${savedItem.title}"?`
+        : `Are you sure you want to save your edits to "${savedItem.title}"?`,
+      confirmText: isNew ? 'Create' : 'Save',
+      onConfirm: () => {
+        setItems(prev => {
+          const exists = prev.some(item => item.id === savedItem.id);
+          if (exists) {
+            return prev.map(item => item.id === savedItem.id ? savedItem : item);
+          } else {
+            return [savedItem, ...prev];
+          }
+        });
+
+        // Also update collection associations
+        if (savedItem.collections && savedItem.collections.length > 0) {
+          setCollections(prev => prev.map(col => {
+            const belongs = savedItem.collections.some(c => c.id === col.id);
+            const hasItem = col.items.some(i => i.id === savedItem.id);
+
+            if (belongs && !hasItem) {
+              return {
+                ...col,
+                itemCount: col.itemCount + 1,
+                items: [savedItem, ...col.items]
+              };
+            } else if (!belongs && hasItem) {
+              return {
+                ...col,
+                itemCount: Math.max(0, col.itemCount - 1),
+                items: col.items.filter(i => i.id !== savedItem.id)
+              };
+            } else if (belongs && hasItem) {
+              return {
+                ...col,
+                items: col.items.map(i => i.id === savedItem.id ? savedItem : i)
+              };
+            }
+            return col;
+          }));
+        }
+
+        closeConfirm();
+        if (callback) callback();
       }
     });
-
-    // Also update collection associations
-    if (savedItem.collections && savedItem.collections.length > 0) {
-      setCollections(prev => prev.map(col => {
-        const belongs = savedItem.collections.some(c => c.id === col.id);
-        const hasItem = col.items.some(i => i.id === savedItem.id);
-
-        if (belongs && !hasItem) {
-          return {
-            ...col,
-            itemCount: col.itemCount + 1,
-            items: [savedItem, ...col.items]
-          };
-        } else if (!belongs && hasItem) {
-          return {
-            ...col,
-            itemCount: Math.max(0, col.itemCount - 1),
-            items: col.items.filter(i => i.id !== savedItem.id)
-          };
-        } else if (belongs && hasItem) {
-          return {
-            ...col,
-            items: col.items.map(i => i.id === savedItem.id ? savedItem : i)
-          };
-        }
-        return col;
-      }));
-    }
   };
 
-  const handleDeleteItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
-    setCollections(prev => prev.map(col => ({
-      ...col,
-      items: col.items.filter(i => i.id !== id),
-      itemCount: col.items.filter(i => i.id !== id).length
-    })));
+  const handleDeleteItem = (id: string, callback?: () => void) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    showConfirm({
+      title: 'Delete Item',
+      message: `Are you sure you want to permanently delete "${item.title}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      isDestructive: true,
+      onConfirm: () => {
+        setItems(prev => prev.filter(item => item.id !== id));
+        setCollections(prev => prev.map(col => ({
+          ...col,
+          items: col.items.filter(i => i.id !== id),
+          itemCount: col.items.filter(i => i.id !== id).length
+        })));
+        closeConfirm();
+        if (callback) callback();
+      }
+    });
   };
 
   // Collection Modal Actions
@@ -240,13 +347,26 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsCollectionModalOpen(true);
   };
 
-  const handleSaveCollection = (savedCol: Collection) => {
-    setCollections(prev => {
-      const exists = prev.some(c => c.id === savedCol.id);
-      if (exists) {
-        return prev.map(c => c.id === savedCol.id ? savedCol : c);
-      } else {
-        return [...prev, savedCol];
+  const handleSaveCollection = (savedCol: Collection, callback?: () => void) => {
+    const isNew = !collections.some(c => c.id === savedCol.id);
+
+    showConfirm({
+      title: isNew ? 'Create Collection' : 'Save Changes',
+      message: isNew 
+        ? `Are you sure you want to create and save the collection "${savedCol.name}"?`
+        : `Are you sure you want to save changes to the collection "${savedCol.name}"?`,
+      confirmText: isNew ? 'Create' : 'Save',
+      onConfirm: () => {
+        setCollections(prev => {
+          const exists = prev.some(c => c.id === savedCol.id);
+          if (exists) {
+            return prev.map(c => c.id === savedCol.id ? savedCol : c);
+          } else {
+            return [...prev, savedCol];
+          }
+        });
+        closeConfirm();
+        if (callback) callback();
       }
     });
   };
@@ -261,6 +381,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     if (activeFilter.type === 'favorites') {
       itemsFiltered = itemsFiltered.filter(i => i.isFavorite);
+    } else if (activeFilter.type === 'pinned') {
+      itemsFiltered = itemsFiltered.filter(i => i.isPinned);
     } else if (activeFilter.type === 'type') {
       itemsFiltered = itemsFiltered.filter(i => i.itemType.name === activeFilter.value);
     } else if (activeFilter.type === 'collection') {
@@ -269,6 +391,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const itemIds = targetCol.items.map(item => item.id);
         itemsFiltered = itemsFiltered.filter(i => itemIds.includes(i.id));
       }
+    } else if (activeFilter.type === 'favorite_collections' || activeFilter.type === 'collections') {
+      return [];
     }
 
     if (searchQuery.trim()) {
@@ -293,11 +417,15 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const filteredCollections = useMemo(() => {
     let cols = [...collections];
 
-    if (activeFilter.type === 'favorites') {
+    if (activeFilter.type === 'favorite_collections') {
+      cols = cols.filter(c => c.isFavorite);
+    } else if (activeFilter.type === 'favorites') {
       cols = cols.filter(c => c.isFavorite);
     } else if (activeFilter.type === 'collection') {
       cols = cols.filter(c => c.id === activeFilter.value);
-    } else if (activeFilter.type === 'type') {
+    } else if (activeFilter.type === 'collections') {
+      // Keep all collections
+    } else if (activeFilter.type === 'pinned' || activeFilter.type === 'type' || activeFilter.type === 'items') {
       return [];
     }
 
@@ -337,6 +465,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setMobileOpen,
         proMode,
         setProMode,
+        confirmDialog,
+        showConfirm,
+        closeConfirm,
         handleToggleItemFavorite,
         handleToggleItemPin,
         handleToggleCollectionFavorite,

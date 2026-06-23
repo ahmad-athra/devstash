@@ -19,8 +19,8 @@ import { DynamicIcon } from './DynamicIcon';
 import { useDashboardContext, singularToPluralType } from '@/context/DashboardContext';
 
 interface SidebarProps {
-  activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection'; value?: string };
-  setActiveFilter: (filter: { type: 'all' | 'favorites' | 'type' | 'collection'; value?: string }) => void;
+  activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection' | 'pinned' | 'collections' | 'items' | 'favorite_collections'; value?: string };
+  setActiveFilter: (filter: { type: 'all' | 'favorites' | 'type' | 'collection' | 'pinned' | 'collections' | 'items' | 'favorite_collections'; value?: string }) => void;
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
   proMode: boolean;

@@ -15,7 +15,7 @@ import {
 import { MOCK_COLLECTIONS, MOCK_ITEM_TYPES } from '@/lib/mockData';
 
 interface HeaderProps {
-  activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection'; value?: string };
+  activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection' | 'pinned' | 'collections' | 'items' | 'favorite_collections'; value?: string };
   onNewItemClick: () => void;
   onNewCollectionClick: () => void;
   searchQuery: string;
@@ -42,6 +42,14 @@ export default function Header({
         return { parent: 'Dashboard', child: 'All Stashes' };
       case 'favorites':
         return { parent: 'Dashboard', child: 'Favorites' };
+      case 'pinned':
+        return { parent: 'Dashboard', child: 'Pinned Items' };
+      case 'collections':
+        return { parent: 'Dashboard', child: 'All Collections' };
+      case 'favorite_collections':
+        return { parent: 'Dashboard', child: 'Favorite Collections' };
+      case 'items':
+        return { parent: 'Dashboard', child: 'All Items' };
       case 'type':
         return { parent: 'Item Types', child: activeFilter.value || '' };
       case 'collection':

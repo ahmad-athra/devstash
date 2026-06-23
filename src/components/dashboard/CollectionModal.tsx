@@ -9,7 +9,7 @@ import { DynamicIcon } from './DynamicIcon';
 interface CollectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (collection: any) => void;
+  onSave: (collection: any, onSuccess?: () => void) => void;
   collection: Collection | null; // null if creating
 }
 
@@ -56,8 +56,9 @@ export default function CollectionModal({
       updatedAt: new Date().toISOString(),
     };
 
-    onSave(data);
-    onClose();
+    onSave(data, () => {
+      onClose();
+    });
   };
 
   return (

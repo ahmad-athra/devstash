@@ -118,7 +118,7 @@ Follow coding guidelines strictly:
 3. Document high-level designs.
 4. Output structured, descriptive JSON formats.`,
   isFavorite: true,
-  isPinned: false,
+  isPinned: true,
   itemType: MOCK_ITEM_TYPES.prompt,
   tags: [{ id: 't4', name: 'ai' }, { id: 't5', name: 'claude' }, { id: 't6', name: 'prompting' }],
   collections: [{ id: 'col-5', name: 'Prompt Library' }],
@@ -152,7 +152,7 @@ const item4: Item = {
 - Rewrite url paths to include sub-domains internally if needed.
 - Cache user tenant lookups in memory for max 5 minutes using simple Map structures.`,
   isFavorite: false,
-  isPinned: false,
+  isPinned: true,
   itemType: MOCK_ITEM_TYPES.note,
   tags: [{ id: 't10', name: 'nextjs' }, { id: 't11', name: 'architecture' }, { id: 't12', name: 'tenant' }],
   collections: [{ id: 'col-2', name: 'Context Files' }],
@@ -201,7 +201,7 @@ const item7: Item = {
   fileSize: 1245000,
   fileUrl: '#mock-url-png',
   isFavorite: true,
-  isPinned: false,
+  isPinned: true,
   itemType: MOCK_ITEM_TYPES.image,
   tags: [{ id: 't19', name: 'design' }, { id: 't20', name: 'figma' }, { id: 't21', name: 'assets' }],
   collections: [{ id: 'col-2', name: 'Context Files' }, { id: 'col-7', name: 'UI & Design Assets' }],
