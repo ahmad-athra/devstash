@@ -1,20 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { 
   Folder, 
   Star, 
   ChevronLeft, 
   ChevronRight, 
-  Search, 
+  ChevronDown,
   Sparkles, 
   Layers, 
   LogOut,
   LayoutDashboard,
   ShieldCheck
 } from 'lucide-react';
-import { MOCK_ITEM_TYPES, MOCK_COLLECTIONS, MOCK_USER } from '@/lib/mockData';
+import { MOCK_ITEM_TYPES, MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from './DynamicIcon';
+import { useDashboardContext, singularToPluralType } from '@/context/DashboardContext';
 
 interface SidebarProps {
   activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection'; value?: string };
@@ -37,7 +39,12 @@ export default function Sidebar({
   mobileOpen,
   setMobileOpen,
 }: SidebarProps) {
+  const { collections } = useDashboardContext();
   const itemTypes = Object.values(MOCK_ITEM_TYPES);
+  
+  const [favsCollapsed, setFavsCollapsed] = useState(false);
+  const [recentsCollapsed, setRecentsCollapsed] = useState(false);
+
   const userInitials = MOCK_USER.name
     .split(' ')
     .map(n => n[0])
@@ -49,6 +56,19 @@ export default function Sidebar({
     setActiveFilter({ type, value });
     setMobileOpen(false); // Close drawer on mobile click
   };
+
+  // Filter collections for sections
+  const favoriteCollections = useMemo(() => {
+    return collections.filter(col => col.isFavorite);
+  }, [collections]);
+
+  const recentCollections = useMemo(() => {
+    // Exclude favorites to avoid duplicates and show the 4 most recently updated collections
+    return [...collections]
+      .filter(col => !col.isFavorite)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 4);
+  }, [collections]);
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0f0f12] text-zinc-300 border-r border-zinc-800/80 transition-all duration-300">
@@ -103,7 +123,8 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
         {/* Main Filters */}
         <div className="space-y-1">
-          <button
+          <Link
+            href="/dashboard"
             onClick={() => handleFilterClick('all')}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
               activeFilter.type === 'all'
@@ -113,9 +134,10 @@ export default function Sidebar({
           >
             <LayoutDashboard className="h-4.5 w-4.5 text-zinc-400" />
             {!isCollapsed && <span>Dashboard Home</span>}
-          </button>
+          </Link>
           
-          <button
+          <Link
+            href="/dashboard"
             onClick={() => handleFilterClick('favorites')}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
               activeFilter.type === 'favorites'
@@ -125,7 +147,7 @@ export default function Sidebar({
           >
             <Star className="h-4.5 w-4.5 text-yellow-500/80 fill-yellow-500/20" />
             {!isCollapsed && <span>Favorites</span>}
-          </button>
+          </Link>
         </div>
 
         {/* Item Types */}
@@ -138,8 +160,9 @@ export default function Sidebar({
               const isSelected = activeFilter.type === 'type' && activeFilter.value === type.name;
               
               return (
-                <button
+                <Link
                   key={type.id}
+                  href={`/items/${singularToPluralType(type.name)}`}
                   onClick={() => handleFilterClick('type', type.name)}
                   className={`group w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                     isSelected
@@ -162,47 +185,115 @@ export default function Sidebar({
                   {!isCollapsed && type.proOnly && (
                     <ShieldCheck className={`h-3.5 w-3.5 ${proMode ? 'text-purple-400' : 'text-zinc-600 group-hover:text-zinc-500'}`} />
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
         </div>
 
-        {/* Collections */}
+        {/* Favorite Collections */}
         <div>
-          {!isCollapsed && (
-            <h3 className="px-3 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2">Collections</h3>
+          {!isCollapsed ? (
+            <button 
+              onClick={() => setFavsCollapsed(!favsCollapsed)}
+              className="w-full flex items-center justify-between px-3 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2 select-none hover:text-zinc-300 transition-colors"
+            >
+              <span>Favorite Collections</span>
+              {favsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+            </button>
+          ) : (
+            <div className="px-3 border-b border-zinc-800/20 pb-1 mb-2" />
           )}
-          <div className="space-y-1">
-            {MOCK_COLLECTIONS.map((col) => {
-              const isSelected = activeFilter.type === 'collection' && activeFilter.value === col.id;
-              // Get color of default item type for color-coding matching spec
-              const typeColor = MOCK_ITEM_TYPES[col.defaultTypeId?.replace('type-', '') || 'note']?.color || '#a1a1aa';
-              
-              return (
-                <button
-                  key={col.id}
-                  onClick={() => handleFilterClick('collection', col.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
-                    isSelected
-                      ? 'bg-zinc-800/80 text-white font-semibold'
-                      : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
-                  }`}
-                >
-                  <Folder 
-                    className="h-4 w-4 transition-transform group-hover:scale-110" 
-                    style={{ color: typeColor }}
-                  />
-                  {!isCollapsed && (
-                    <span className="truncate flex-1">{col.name}</span>
-                  )}
-                  {!isCollapsed && col.isFavorite && (
-                    <Star className="h-3 w-3 text-yellow-500/80 fill-yellow-500/30" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          
+          {(!isCollapsed && favsCollapsed) ? null : (
+            <div className="space-y-1">
+              {favoriteCollections.length === 0 ? (
+                !isCollapsed && (
+                  <p className="px-3 py-1 text-xs text-zinc-600 italic">No favorites yet</p>
+                )
+              ) : (
+                favoriteCollections.map((col) => {
+                  const isSelected = activeFilter.type === 'collection' && activeFilter.value === col.id;
+                  const typeColor = MOCK_ITEM_TYPES[col.defaultTypeId?.replace('type-', '') || 'note']?.color || '#a1a1aa';
+                  
+                  return (
+                    <Link
+                      key={col.id}
+                      href="/dashboard"
+                      onClick={() => handleFilterClick('collection', col.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
+                        isSelected
+                          ? 'bg-zinc-800/80 text-white font-semibold'
+                          : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+                      }`}
+                    >
+                      <Folder 
+                        className="h-4 w-4 transition-transform group-hover:scale-110" 
+                        style={{ color: typeColor }}
+                      />
+                      {!isCollapsed && (
+                        <span className="truncate flex-1">{col.name}</span>
+                      )}
+                      {!isCollapsed && (
+                        <Star className="h-3 w-3 text-yellow-500/80 fill-yellow-500/30" />
+                      )}
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Collections */}
+        <div>
+          {!isCollapsed ? (
+            <button 
+              onClick={() => setRecentsCollapsed(!recentsCollapsed)}
+              className="w-full flex items-center justify-between px-3 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2 select-none hover:text-zinc-300 transition-colors"
+            >
+              <span>Recent Collections</span>
+              {recentsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+            </button>
+          ) : (
+            <div className="px-3 border-b border-zinc-800/20 pb-1 mb-2" />
+          )}
+          
+          {(!isCollapsed && recentsCollapsed) ? null : (
+            <div className="space-y-1">
+              {recentCollections.length === 0 ? (
+                !isCollapsed && (
+                  <p className="px-3 py-1 text-xs text-zinc-600 italic">No recent folders</p>
+                )
+              ) : (
+                recentCollections.map((col) => {
+                  const isSelected = activeFilter.type === 'collection' && activeFilter.value === col.id;
+                  const typeColor = MOCK_ITEM_TYPES[col.defaultTypeId?.replace('type-', '') || 'note']?.color || '#a1a1aa';
+                  
+                  return (
+                    <Link
+                      key={col.id}
+                      href="/dashboard"
+                      onClick={() => handleFilterClick('collection', col.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
+                        isSelected
+                          ? 'bg-zinc-800/80 text-white font-semibold'
+                          : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+                      }`}
+                    >
+                      <Folder 
+                        className="h-4 w-4 transition-transform group-hover:scale-110" 
+                        style={{ color: typeColor }}
+                      />
+                      {!isCollapsed && (
+                        <span className="truncate flex-1">{col.name}</span>
+                      )}
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
       </div>
 
