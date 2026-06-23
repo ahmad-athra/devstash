@@ -7,7 +7,7 @@ import CollectionGrid from '@/components/dashboard/CollectionGrid';
 import ItemGrid from '@/components/dashboard/ItemGrid';
 import ItemDrawer from '@/components/dashboard/ItemDrawer';
 import CollectionModal from '@/components/dashboard/CollectionModal';
-import { MOCK_ITEMS, MOCK_COLLECTIONS } from '@/lib/mockData';
+import { MOCK_ITEMS, MOCK_COLLECTIONS, MOCK_USER } from '@/lib/mockData';
 import { Item, Collection } from '@/types/dashboard';
 import { 
   Sparkles, 
@@ -252,7 +252,7 @@ export default function DashboardPage() {
               <div className="space-y-1 relative">
                 <div className="flex items-center gap-2 text-blue-400 font-semibold text-xs">
                   <TrendingUp className="h-4 w-4" />
-                  <span>Welcome Back, Developer!</span>
+                  <span>Welcome Back, {MOCK_USER.name.split(' ')[0]}!</span>
                 </div>
                 <h1 className="text-xl font-bold text-white tracking-tight">Your DevStash hub is active.</h1>
                 <p className="text-xs text-zinc-400 max-w-xl">

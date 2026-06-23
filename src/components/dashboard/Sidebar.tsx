@@ -13,7 +13,7 @@ import {
   LayoutDashboard,
   ShieldCheck
 } from 'lucide-react';
-import { MOCK_ITEM_TYPES, MOCK_COLLECTIONS } from '@/lib/mockData';
+import { MOCK_ITEM_TYPES, MOCK_COLLECTIONS, MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from './DynamicIcon';
 
 interface SidebarProps {
@@ -38,6 +38,12 @@ export default function Sidebar({
   setMobileOpen,
 }: SidebarProps) {
   const itemTypes = Object.values(MOCK_ITEM_TYPES);
+  const userInitials = MOCK_USER.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
 
   const handleFilterClick = (type: 'all' | 'favorites' | 'type' | 'collection', value?: string) => {
     setActiveFilter({ type, value });
@@ -205,15 +211,15 @@ export default function Sidebar({
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-white text-sm border border-zinc-700">
-              AH
+              {userInitials}
             </div>
             <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#0f0f12] ${proMode ? 'bg-purple-500' : 'bg-emerald-500'}`} />
           </div>
           
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-zinc-200 truncate">Ahmad AbuAtherah</p>
-              <p className="text-[10px] text-zinc-500 truncate">ahmad@devstash.io</p>
+              <p className="text-xs font-semibold text-zinc-200 truncate">{MOCK_USER.name}</p>
+              <p className="text-[10px] text-zinc-500 truncate">{MOCK_USER.email}</p>
             </div>
           )}
           

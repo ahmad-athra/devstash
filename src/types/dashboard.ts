@@ -45,3 +45,14 @@ export interface Collection {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  isPro: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
