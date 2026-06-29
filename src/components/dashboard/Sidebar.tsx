@@ -14,7 +14,7 @@ import {
   LayoutDashboard,
   ShieldCheck
 } from 'lucide-react';
-import { MOCK_ITEM_TYPES, MOCK_USER } from '@/lib/mockData';
+import { MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from './DynamicIcon';
 import { useDashboardContext, singularToPluralType } from '@/context/DashboardContext';
 import { getCollectionThemeColor } from '@/lib/utils';
@@ -48,8 +48,7 @@ export default function Sidebar({
   mobileOpen,
   setMobileOpen,
 }: SidebarProps) {
-  const { collections } = useDashboardContext();
-  const itemTypes = Object.values(MOCK_ITEM_TYPES);
+  const { collections, itemTypes } = useDashboardContext();
   
   const [favsCollapsed, setFavsCollapsed] = useState(false);
   const [recentsCollapsed, setRecentsCollapsed] = useState(false);
@@ -294,16 +293,28 @@ export default function Sidebar({
                           : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
                       }`}
                     >
-                      <Folder 
-                        className="h-4 w-4 transition-transform group-hover:scale-110" 
-                        style={{ color: typeColor }}
-                      />
+                      <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                        <span 
+                          className="h-2 w-2 rounded-full transition-transform group-hover:scale-110" 
+                          style={{ backgroundColor: typeColor }}
+                        />
+                      </div>
                       {!isCollapsed && (
                         <span className="truncate flex-1">{col.name}</span>
                       )}
                     </Link>
                   );
                 })
+              )}
+
+              {!isCollapsed && (
+                <Link
+                  href="/collections"
+                  onClick={() => handleFilterClick('collections')}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 mt-2 rounded-lg text-xs font-medium text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/40 border border-dashed border-zinc-800/80 hover:border-zinc-700/60 transition-all text-center cursor-pointer"
+                >
+                  View all collections
+                </Link>
               )}
             </div>
           )}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Collection } from '@/types/dashboard';
-import { MOCK_ITEM_TYPES } from '@/lib/mockData';
+import { useDashboardContext } from '@/context/DashboardContext';
 import { X, Save, FolderOpen, Star } from 'lucide-react';
 import { DynamicIcon } from './DynamicIcon';
 
@@ -19,6 +19,7 @@ export default function CollectionModal({
   onSave,
   collection,
 }: CollectionModalProps) {
+  const { itemTypes } = useDashboardContext();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [defaultTypeId, setDefaultTypeId] = useState('type-snippet');
@@ -120,11 +121,11 @@ export default function CollectionModal({
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Default Color Theme (Based on Dominant Type)</label>
             <div className="grid grid-cols-4 gap-2">
-              {Object.entries(MOCK_ITEM_TYPES).map(([key, type]) => {
+              {itemTypes.map((type) => {
                 const isSelected = defaultTypeId === type.id;
                 return (
                   <button
-                    key={key}
+                    key={type.id}
                     type="button"
                     onClick={() => setDefaultTypeId(type.id)}
                     className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border text-[10px] transition-all capitalize ${

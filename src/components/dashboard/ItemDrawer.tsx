@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Item, ContentType, Tag } from '@/types/dashboard';
-import { MOCK_ITEM_TYPES } from '@/lib/mockData';
+import { useDashboardContext } from '@/context/DashboardContext';
 import { DynamicIcon } from './DynamicIcon';
 import { 
   X, 
@@ -41,6 +41,10 @@ export default function ItemDrawer({
   onDelete,
   proMode,
 }: ItemDrawerProps) {
+  const { itemTypes } = useDashboardContext();
+  const typeMap = useMemo(() => {
+    return new Map(itemTypes.map(t => [t.name.toLowerCase(), t]));
+  }, [itemTypes]);
   const [activeTab, setActiveTab] = useState<'view' | 'edit'>('view');
   
   // Form fields
@@ -109,7 +113,7 @@ export default function ItemDrawer({
   // Adjust content type automatically based on itemType select
   const handleItemTypeChange = (key: string) => {
     setItemTypeKey(key);
-    const selectedType = MOCK_ITEM_TYPES[key];
+    const selectedType = typeMap.get(key);
     if (selectedType) {
       setContentType(selectedType.contentType);
     }
@@ -127,7 +131,14 @@ export default function ItemDrawer({
   };
 
   const handleSave = () => {
-    const selectedType = MOCK_ITEM_TYPES[itemTypeKey] || MOCK_ITEM_TYPES.snippet;
+    const selectedType = typeMap.get(itemTypeKey) || typeMap.get('snippet') || {
+      id: `type-${itemTypeKey}`,
+      name: itemTypeKey,
+      icon: 'Code',
+      color: '#3b82f6',
+      contentType: 'TEXT' as const,
+      proOnly: false
+    } as any;
     const updatedData = {
       id: item?.id || `item-${Date.now()}`,
       title,
@@ -237,7 +248,14 @@ export default function ItemDrawer({
 
   if (!isOpen) return null;
 
-  const currentTypeConfig = MOCK_ITEM_TYPES[itemTypeKey] || MOCK_ITEM_TYPES.snippet;
+  const currentTypeConfig = typeMap.get(itemTypeKey) || typeMap.get('snippet') || {
+    id: `type-${itemTypeKey}`,
+    name: itemTypeKey,
+    icon: 'Code',
+    color: '#3b82f6',
+    contentType: 'TEXT' as const,
+    proOnly: false
+  };
   const currentThemeColor = currentTypeConfig.color;
 
   return (
@@ -532,16 +550,15 @@ export default function ItemDrawer({
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Item Type</label>
                 <div className="grid grid-cols-4 gap-2">
-                  {Object.keys(MOCK_ITEM_TYPES).map((key) => {
-                    const typeConfig = MOCK_ITEM_TYPES[key];
-                    const isSelected = itemTypeKey === key;
-                    const isTypePro = typeConfig.proOnly;
+                  {itemTypes.map((type) => {
+                    const isSelected = itemTypeKey === type.name.toLowerCase();
+                    const isTypePro = type.proOnly;
                     
                     return (
                       <button
-                        key={key}
+                        key={type.id}
                         type="button"
-                        onClick={() => handleItemTypeChange(key)}
+                        onClick={() => handleItemTypeChange(type.name.toLowerCase())}
                         disabled={isTypePro && !proMode}
                         className={`flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-xl border text-[11px] transition-all capitalize relative ${
                           isSelected
@@ -549,13 +566,13 @@ export default function ItemDrawer({
                             : 'bg-zinc-900/40 border-zinc-800/80 text-zinc-400 hover:bg-zinc-900/80 hover:text-zinc-200'
                         } ${isTypePro && !proMode ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
                         style={{ 
-                          borderColor: isSelected ? typeConfig.color : undefined,
+                          borderColor: isSelected ? type.color : undefined,
                         }}
                       >
-                        <span style={{ color: typeConfig.color }}>
-                          <DynamicIcon name={typeConfig.icon} className="h-4 w-4" />
+                        <span style={{ color: type.color }}>
+                          <DynamicIcon name={type.icon} className="h-4 w-4" />
                         </span>
-                        <span>{typeConfig.name}</span>
+                        <span>{type.name}</span>
                         {isTypePro && (
                           <span className={`absolute top-1 right-1 text-[7px] px-1 py-0.2 rounded font-mono ${proMode ? 'bg-purple-950/20 text-purple-400' : 'bg-zinc-800 text-zinc-500'}`}>
                             {proMode ? 'PRO' : '🔒'}

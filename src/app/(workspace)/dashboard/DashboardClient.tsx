@@ -15,7 +15,7 @@ import {
   Calendar,
   ArrowRight
 } from 'lucide-react';
-import { MOCK_USER, MOCK_ITEM_TYPES } from '@/lib/mockData';
+import { MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from '@/components/dashboard/DynamicIcon';
 import { getCollectionThemeColor } from '@/lib/utils';
 import Link from 'next/link';

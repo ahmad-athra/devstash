@@ -12,7 +12,7 @@ import {
   HelpCircle,
   FolderPlus
 } from 'lucide-react';
-import { MOCK_COLLECTIONS, MOCK_ITEM_TYPES } from '@/lib/mockData';
+import { useDashboardContext } from '@/context/DashboardContext';
 
 interface HeaderProps {
   activeFilter: { type: 'all' | 'favorites' | 'type' | 'collection' | 'pinned' | 'collections' | 'items' | 'favorite_collections' | 'favorite_items'; value?: string };
@@ -35,6 +35,7 @@ export default function Header({
   proMode,
   itemCount,
 }: HeaderProps) {
+  const { collections } = useDashboardContext();
   // Compute title and breadcrumbs
   const getFilterBreadcrumb = () => {
     switch (activeFilter.type) {
@@ -55,7 +56,7 @@ export default function Header({
       case 'type':
         return { parent: 'Item Types', child: activeFilter.value || '' };
       case 'collection':
-        const col = MOCK_COLLECTIONS.find(c => c.id === activeFilter.value);
+        const col = collections.find(c => c.id === activeFilter.value);
         return { parent: 'Collections', child: col?.name || 'Collection' };
       default:
         return { parent: 'Dashboard', child: 'DevStash' };

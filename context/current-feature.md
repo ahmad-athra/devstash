@@ -12,6 +12,9 @@ None
 
 ## History
 
+- **Stats & Sidebar**: Fetched and displayed system item types dynamically from the PostgreSQL database in the sidebar, replacing `MOCK_ITEM_TYPES`. Integrated a new database helper `src/lib/db/itemType.ts` to query system types, passing them to layout and context state. Configured the recent collections list in the sidebar to render colored indicator circles (representing the dominant item type color in the folder) instead of folder icons, and added a "View all collections" link. Created dedicated route pages (`/collections`) to show all database-driven collection cards, and cleaned up mock collections breadcrumb resolution.
+
+
 - **Dashboard Items**: Replaced mock item data in the main area of the dashboard (recent and pinned items) with actual database records using Prisma and Neon PostgreSQL. Created a data fetching helper for stashed items under `src/lib/db/items.ts`. Configured parallel database queries in the workspace layout component. Relocated database mapping utilities (`mapItem`, `mapItemType`, `mapContentType`, `mapProOnly`) to a shared helper module in `src/lib/utils.ts`. Configured the Pinned Items widget to hide completely when there are no pinned items and optimized the layout to expand the Favorite Items section dynamically.
 
 - **Dashboard Collections & Breadcrumbs Enhancement**: Replaced mock cockpit data with actual collections fetched server-side from PostgreSQL via Prisma. Implemented custom folder theme color utilities mapping from collection item types, integrated responsive ShadCN Breadcrumb navigation trails, resolved Next.js router/browser race conditions by configuring direct declarative `Link` routes, and preserved filter states and navigation histories (including dynamic parent linkages) by introducing a context state tracking parameter.

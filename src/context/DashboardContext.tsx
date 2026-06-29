@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
-import { Item, Collection } from '@/types/dashboard';
+import { Item, Collection, ItemType } from '@/types/dashboard';
 import { usePathname, useRouter, useParams, useSearchParams } from 'next/navigation';
 
 export const pluralToSingularType = (plural: string): string => {
@@ -58,6 +58,8 @@ interface DashboardContextType {
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   collections: Collection[];
   setCollections: React.Dispatch<React.SetStateAction<Collection[]>>;
+  itemTypes: ItemType[];
+  setItemTypes: React.Dispatch<React.SetStateAction<ItemType[]>>;
   
   activeFilter: ActiveFilter;
   setActiveFilter: (filter: ActiveFilter) => void;
@@ -111,10 +113,12 @@ export const DashboardProvider: React.FC<{
   children: React.ReactNode; 
   initialCollections?: Collection[]; 
   initialItems?: Item[];
+  initialItemTypes?: ItemType[];
 }> = ({ 
   children,
   initialCollections = [],
-  initialItems = []
+  initialItems = [],
+  initialItemTypes = []
 }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -124,9 +128,13 @@ export const DashboardProvider: React.FC<{
   // App dataset states
   const [items, setItems] = useState<Item[]>(initialItems);
   const [collections, setCollections] = useState<Collection[]>(initialCollections);
+  const [itemTypes, setItemTypes] = useState<ItemType[]>(initialItemTypes);
 
   // Filters state - derived directly from URL parameters to avoid cascading renders
   const activeFilter = useMemo<ActiveFilter>(() => {
+    if (pathname === '/collections') {
+      return { type: 'collections' };
+    }
     if (pathname.startsWith('/items/')) {
       const typeParam = params?.type as string;
       if (typeParam) {
@@ -221,7 +229,7 @@ export const DashboardProvider: React.FC<{
     } else if (filter.type === 'pinned') {
       router.push('/dashboard?filter=pinned');
     } else if (filter.type === 'collections') {
-      router.push('/dashboard?filter=collections');
+      router.push('/collections');
     } else if (filter.type === 'items') {
       router.push('/dashboard?filter=items');
     } else {
@@ -482,6 +490,8 @@ export const DashboardProvider: React.FC<{
         setItems,
         collections,
         setCollections,
+        itemTypes,
+        setItemTypes,
         activeFilter,
         setActiveFilter,
         searchQuery,
