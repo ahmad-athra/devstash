@@ -74,79 +74,85 @@ async function main() {
     },
   });
 
-  // 3. Seed Collections
-  console.log("-> Seeding Collections...");
-  for (const col of MOCK_COLLECTIONS) {
-    // In mock data, defaultTypeId points to "type-snippet" etc.
-    let dbDefaultTypeId: string | null = null;
-    if (col.defaultTypeId) {
-      // Find the name of the type from MOCK_ITEM_TYPES
-      const mockTypeObj = Object.values(MOCK_ITEM_TYPES).find(t => t.id === col.defaultTypeId);
-      if (mockTypeObj) {
-        dbDefaultTypeId = getDbTypeId(mockTypeObj.name);
+  // 3. Seed Mock Collections & Items (skip in production unless forced)
+  const shouldSeedMockData = process.env.NODE_ENV !== "production" || process.env.SEED_MOCK_DATA === "true";
+
+  if (shouldSeedMockData) {
+    console.log("-> Seeding Mock Collections...");
+    for (const col of MOCK_COLLECTIONS) {
+      // In mock data, defaultTypeId points to "type-snippet" etc.
+      let dbDefaultTypeId: string | null = null;
+      if (col.defaultTypeId) {
+        // Find the name of the type from MOCK_ITEM_TYPES
+        const mockTypeObj = Object.values(MOCK_ITEM_TYPES).find(t => t.id === col.defaultTypeId);
+        if (mockTypeObj) {
+          dbDefaultTypeId = getDbTypeId(mockTypeObj.name);
+        }
       }
+
+      await prisma.collection.upsert({
+        where: { id: col.id },
+        update: {},
+        create: {
+          id: col.id,
+          name: col.name,
+          description: col.description,
+          isFavorite: col.isFavorite,
+          defaultTypeId: dbDefaultTypeId,
+          userId: demoUser.id,
+          createdAt: new Date(col.createdAt),
+          updatedAt: new Date(col.updatedAt),
+        },
+      });
     }
 
-    await prisma.collection.upsert({
-      where: { id: col.id },
-      update: {},
-      create: {
-        id: col.id,
-        name: col.name,
-        description: col.description,
-        isFavorite: col.isFavorite,
-        defaultTypeId: dbDefaultTypeId,
-        userId: demoUser.id,
-        createdAt: new Date(col.createdAt),
-        updatedAt: new Date(col.updatedAt),
-      },
-    });
-  }
+    // 4. Seed Mock Items
+    console.log("-> Seeding Mock Items & Tags...");
+    for (const item of MOCK_ITEMS) {
+      const dbItemTypeId = getDbTypeId(item.itemType.name);
 
-  // 4. Seed Items
-  console.log("-> Seeding Items & Tags...");
-  for (const item of MOCK_ITEMS) {
-    const dbItemTypeId = getDbTypeId(item.itemType.name);
-
-    await prisma.item.upsert({
-      where: { id: item.id },
-      update: {},
-      create: {
-        id: item.id,
-        title: item.title,
-        description: item.description,
-        contentType: item.contentType,
-        content: item.content,
-        url: item.url,
-        fileUrl: item.fileUrl,
-        fileName: item.fileName,
-        fileSize: item.fileSize,
-        language: item.language,
-        isFavorite: item.isFavorite,
-        isPinned: item.isPinned,
-        userId: demoUser.id,
-        itemTypeId: dbItemTypeId,
-        createdAt: new Date(item.createdAt),
-        updatedAt: new Date(item.updatedAt),
-        tags: {
-          create: item.tags?.map((tag) => ({
-            tag: {
-              connectOrCreate: {
-                where: { name: tag.name },
-                create: { name: tag.name },
+      await prisma.item.upsert({
+        where: { id: item.id },
+        update: {},
+        create: {
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          contentType: item.contentType,
+          content: item.content,
+          url: item.url,
+          fileUrl: item.fileUrl,
+          fileName: item.fileName,
+          fileSize: item.fileSize,
+          language: item.language,
+          isFavorite: item.isFavorite,
+          isPinned: item.isPinned,
+          userId: demoUser.id,
+          itemTypeId: dbItemTypeId,
+          createdAt: new Date(item.createdAt),
+          updatedAt: new Date(item.updatedAt),
+          tags: {
+            create: item.tags?.map((tag) => ({
+              tag: {
+                connectOrCreate: {
+                  where: { name: tag.name },
+                  create: { name: tag.name },
+                },
               },
-            },
-          })),
+            })),
+          },
+          collections: {
+            create: item.collections?.map((col) => ({
+              collection: {
+                connect: { id: col.id },
+              },
+            })),
+          },
         },
-        collections: {
-          create: item.collections?.map((col) => ({
-            collection: {
-              connect: { id: col.id },
-            },
-          })),
-        },
-      },
-    });
+      });
+    }
+  } else {
+    console.log("-> Skipping mock collections and items seeding (Production/Non-development environment).");
   }
 
   console.log("✅ Seed complete!");
