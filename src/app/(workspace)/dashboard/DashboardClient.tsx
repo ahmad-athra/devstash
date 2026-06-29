@@ -294,36 +294,32 @@ export default function DashboardClient() {
           <div className="space-y-8 pt-2">
             
             {/* ROW 1: Pinned Items (left) alongside Favorite Items (right) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className={pinnedItems.length > 0 ? "grid grid-cols-1 lg:grid-cols-2 gap-8" : "grid grid-cols-1 gap-8"}>
               
               {/* Pinned Items Section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Pin className="h-4 w-4 text-blue-400 fill-blue-500/10 shrink-0" />
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
-                      Pinned Items
-                    </h2>
-                    <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded font-mono font-medium">
-                      {items.filter(i => i.isPinned).length}
-                    </span>
+              {pinnedItems.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Pin className="h-4 w-4 text-blue-400 fill-blue-500/10 shrink-0" />
+                      <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+                        Pinned Items
+                      </h2>
+                      <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded font-mono font-medium">
+                        {items.filter(i => i.isPinned).length}
+                      </span>
+                    </div>
+                    {items.filter(i => i.isPinned).length > 4 && (
+                      <button 
+                        onClick={() => setActiveFilter({ type: 'pinned' })}
+                        className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 group cursor-pointer"
+                      >
+                        <span>View all</span>
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+                    )}
                   </div>
-                  {items.filter(i => i.isPinned).length > 4 && (
-                    <button 
-                      onClick={() => setActiveFilter({ type: 'pinned' })}
-                      className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 group cursor-pointer"
-                    >
-                      <span>View all</span>
-                      <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                    </button>
-                  )}
-                </div>
 
-                {pinnedItems.length === 0 ? (
-                  <div className="p-6 border border-zinc-800/60 rounded-xl bg-zinc-900/10 text-center">
-                    <p className="text-xs text-zinc-500">No items pinned to top. Hover over items to pin them.</p>
-                  </div>
-                ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                     {pinnedItems.map((item) => (
                       <DashboardItemCard
@@ -335,8 +331,9 @@ export default function DashboardClient() {
                       />
                     ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
 
               {/* Favorite Items Section */}
               <div className="space-y-4">

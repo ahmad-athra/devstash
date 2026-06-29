@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { Item, Collection } from '@/types/dashboard';
-import { MOCK_ITEMS, MOCK_COLLECTIONS } from '@/lib/mockData';
 import { usePathname, useRouter, useParams, useSearchParams } from 'next/navigation';
 
 export const pluralToSingularType = (plural: string): string => {
@@ -108,9 +107,14 @@ interface DashboardContextType {
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
-export const DashboardProvider: React.FC<{ children: React.ReactNode; initialCollections?: Collection[] }> = ({ 
+export const DashboardProvider: React.FC<{ 
+  children: React.ReactNode; 
+  initialCollections?: Collection[]; 
+  initialItems?: Item[];
+}> = ({ 
   children,
-  initialCollections = []
+  initialCollections = [],
+  initialItems = []
 }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -118,7 +122,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialCol
   const searchParams = useSearchParams();
 
   // App dataset states
-  const [items, setItems] = useState<Item[]>(MOCK_ITEMS);
+  const [items, setItems] = useState<Item[]>(initialItems);
   const [collections, setCollections] = useState<Collection[]>(initialCollections);
 
   // Filters state - derived directly from URL parameters to avoid cascading renders
