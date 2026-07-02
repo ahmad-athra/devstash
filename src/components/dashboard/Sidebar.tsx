@@ -18,6 +18,7 @@ import { MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from './DynamicIcon';
 import { useDashboardContext, singularToPluralType } from '@/context/DashboardContext';
 import { getCollectionThemeColor } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface SidebarProps {
   activeFilter: { 
@@ -48,7 +49,28 @@ export default function Sidebar({
   mobileOpen,
   setMobileOpen,
 }: SidebarProps) {
-  const { collections, itemTypes } = useDashboardContext();
+  const { collections, itemTypes, items } = useDashboardContext();
+
+  // Calculate item counts
+  const totalItemsCount = useMemo(() => items.length, [items]);
+
+  const favoriteItemsCount = useMemo(() => {
+    return items.filter(item => item.isFavorite).length;
+  }, [items]);
+
+  const itemTypeCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    itemTypes.forEach(t => {
+      counts[t.name.toLowerCase()] = 0;
+    });
+    items.forEach(item => {
+      if (item.itemType && item.itemType.name) {
+        const key = item.itemType.name.toLowerCase();
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [items, itemTypes]);
   
   const [favsCollapsed, setFavsCollapsed] = useState(false);
   const [recentsCollapsed, setRecentsCollapsed] = useState(false);
@@ -138,27 +160,41 @@ export default function Sidebar({
           <Link
             href="/dashboard"
             onClick={() => handleFilterClick('all')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`group w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${
               activeFilter.type === 'all'
                 ? 'bg-zinc-800/80 text-white font-semibold shadow-sm'
                 : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <LayoutDashboard className="h-4.5 w-4.5 text-zinc-400" />
-            {!isCollapsed && <span>Dashboard Home</span>}
+            <div className="flex items-center gap-3">
+              <LayoutDashboard className="h-4.5 w-4.5 text-zinc-400" />
+              {!isCollapsed && <span>Dashboard Home</span>}
+            </div>
+            {!isCollapsed && (
+              <Badge variant="glass" aria-label={`Count: ${totalItemsCount} items`}>
+                {totalItemsCount}
+              </Badge>
+            )}
           </Link>
           
           <Link
             href="/dashboard?filter=favorites"
             onClick={() => handleFilterClick('favorites')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`group w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${
               activeFilter.type === 'favorites'
                 ? 'bg-zinc-800/80 text-white font-semibold shadow-sm'
                 : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <Star className="h-4.5 w-4.5 text-yellow-500/80 fill-yellow-500/20" />
-            {!isCollapsed && <span>Favorites</span>}
+            <div className="flex items-center gap-3">
+              <Star className="h-4.5 w-4.5 text-yellow-500/80 fill-yellow-500/20" />
+              {!isCollapsed && <span>Favorites</span>}
+            </div>
+            {!isCollapsed && (
+              <Badge variant="glass" aria-label={`Count: ${favoriteItemsCount} favorite items`}>
+                {favoriteItemsCount}
+              </Badge>
+            )}
           </Link>
         </div>
 
@@ -170,33 +206,43 @@ export default function Sidebar({
           <div className="space-y-1">
             {itemTypes.map((type) => {
               const isSelected = activeFilter.type === 'type' && activeFilter.value === type.name;
+              const count = itemTypeCounts[type.name.toLowerCase()] || 0;
               
               return (
                 <Link
                   key={type.id}
                   href={`/items/${singularToPluralType(type.name)}`}
                   onClick={() => handleFilterClick('type', type.name)}
-                  className={`group w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  style={{ '--type-color': type.color } as React.CSSProperties}
+                  className={`group w-full flex items-center justify-between pl-[9px] pr-3 py-1.5 rounded-lg text-sm font-medium transition-all border-l-[3px] ${
                     isSelected
-                      ? 'bg-zinc-800/80 text-white font-semibold'
-                      : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+                      ? 'bg-zinc-800/80 border-l-[var(--type-color)] text-white font-semibold'
+                      : 'border-l-[color-mix(in_srgb,var(--type-color)_30%,transparent)] hover:border-l-[var(--type-color)] hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="p-1 rounded-md transition-colors"
-                      style={{ 
-                        color: type.color, 
-                        backgroundColor: isSelected ? `${type.color}15` : 'transparent' 
-                      }}
-                    >
-                      <DynamicIcon name={type.icon} className="h-4 w-4" />
-                    </div>
+                    <DynamicIcon 
+                      name={type.icon} 
+                      className={`h-4 w-4 shrink-0 transition-colors ${
+                        isSelected 
+                          ? 'text-[var(--type-color)]' 
+                          : 'text-zinc-500 group-hover:text-[var(--type-color)]'
+                      }`} 
+                    />
                     {!isCollapsed && <span className="capitalize">{type.name}</span>}
                   </div>
-                  {!isCollapsed && type.proOnly && (
-                    <ShieldCheck className={`h-3.5 w-3.5 ${proMode ? 'text-purple-400' : 'text-zinc-600 group-hover:text-zinc-500'}`} />
-                  )}
+                  <div className="flex items-center gap-2">
+                    {!isCollapsed && type.proOnly && (
+                      <span className="text-[10px] font-bold tracking-wider text-[var(--type-color)] select-none">
+                        PRO
+                      </span>
+                    )}
+                    {!isCollapsed && (
+                      <Badge variant="glass" aria-label={`Count: ${count} ${type.name} items`}>
+                        {count}
+                      </Badge>
+                    )}
+                  </div>
                 </Link>
               );
             })}
@@ -233,21 +279,28 @@ export default function Sidebar({
                       key={col.id}
                       href={`/dashboard?collection=${col.id}&from=favorite_collections`}
                       onClick={() => handleFilterClick('collection', col.id, 'favorite_collections')}
-                      className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
+                      className={`group w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
                         isSelected
                           ? 'bg-zinc-800/80 text-white font-semibold'
                           : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
                       }`}
                     >
-                      <Folder 
-                        className="h-4 w-4 transition-transform group-hover:scale-110" 
-                        style={{ color: typeColor }}
-                      />
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <Folder 
+                          className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" 
+                          style={{ color: typeColor }}
+                        />
+                        {!isCollapsed && (
+                          <span className="truncate flex-1">{col.name}</span>
+                        )}
+                        {!isCollapsed && (
+                          <Star className="h-3 w-3 shrink-0 text-yellow-500/80 fill-yellow-500/30" />
+                        )}
+                      </div>
                       {!isCollapsed && (
-                        <span className="truncate flex-1">{col.name}</span>
-                      )}
-                      {!isCollapsed && (
-                        <Star className="h-3 w-3 text-yellow-500/80 fill-yellow-500/30" />
+                        <Badge variant="glass" aria-label={`Count: ${col.itemCount} items`}>
+                          {col.itemCount}
+                        </Badge>
                       )}
                     </Link>
                   );
@@ -287,20 +340,27 @@ export default function Sidebar({
                       key={col.id}
                       href={`/dashboard?collection=${col.id}&from=collections`}
                       onClick={() => handleFilterClick('collection', col.id, 'collections')}
-                      className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
+                      className={`group w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-left ${
                         isSelected
                           ? 'bg-zinc-800/80 text-white font-semibold'
                           : 'hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
                       }`}
                     >
-                      <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                        <span 
-                          className="h-2 w-2 rounded-full transition-transform group-hover:scale-110" 
-                          style={{ backgroundColor: typeColor }}
-                        />
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                          <span 
+                            className="h-2 w-2 rounded-full transition-transform group-hover:scale-110" 
+                            style={{ backgroundColor: typeColor }}
+                          />
+                        </div>
+                        {!isCollapsed && (
+                          <span className="truncate flex-1">{col.name}</span>
+                        )}
                       </div>
                       {!isCollapsed && (
-                        <span className="truncate flex-1">{col.name}</span>
+                        <Badge variant="glass" aria-label={`Count: ${col.itemCount} items`}>
+                          {col.itemCount}
+                        </Badge>
                       )}
                     </Link>
                   );
