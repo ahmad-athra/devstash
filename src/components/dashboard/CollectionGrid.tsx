@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Collection } from '@/types/dashboard';
-import { MOCK_ITEM_TYPES } from '@/lib/mockData';
-import { Star, FolderOpen, Calendar, ArrowRight } from 'lucide-react';
+import { Star, FolderOpen, ArrowRight } from 'lucide-react';
 import { DynamicIcon } from './DynamicIcon';
 import { getCollectionThemeColor } from '@/lib/utils';
 

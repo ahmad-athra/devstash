@@ -11,8 +11,7 @@ import {
   Sparkles, 
   Layers, 
   LogOut,
-  LayoutDashboard,
-  ShieldCheck
+  LayoutDashboard
 } from 'lucide-react';
 import { MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from './DynamicIcon';

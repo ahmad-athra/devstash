@@ -5,11 +5,6 @@ import {
   Plus, 
   Search, 
   Menu, 
-  Sparkles, 
-  Star, 
-  Folder,
-  Layers,
-  HelpCircle,
   FolderPlus
 } from 'lucide-react';
 import { useDashboardContext } from '@/context/DashboardContext';

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useDashboardContext } from '@/context/DashboardContext';
-import { AlertTriangle, CheckCircle, HelpCircle, X, Pin, Star } from 'lucide-react';
+import { AlertTriangle, CheckCircle, X, Pin, Star } from 'lucide-react';
 
 export default function ConfirmationModal() {
   const { confirmDialog, closeConfirm } = useDashboardContext();
