@@ -1,0 +1,18 @@
+# .gemini/commands/list-components.toml
+description = "List project components [subdirectory]"
+
+prompt = """
+Your task is to list all React component files (.tsx, .ts, .jsx, .js) in the components folder.
+
+The user can optionally provide a specific subdirectory to scope this request. 
+The argument provided by the user is: "{{args}}"
+
+If a subdirectory is provided in "{{args}}", only list files in that specific subdirectory of components.
+
+Output Format Requirements:
+1. Provide a numbered list of files with relative paths.
+2. Provide a brief one-line description of each component (infer this from the filename).
+3. Provide a summary count at the very end of your response.
+
+If no files are found or the folder doesn't exist, say "No components found."
+"""
