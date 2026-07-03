@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Item, ContentType, Tag } from '@/types/dashboard';
+import { Item, ContentType, Tag, ItemType } from '@/types/dashboard';
 import { useDashboardContext } from '@/context/DashboardContext';
 import { DynamicIcon } from './DynamicIcon';
 import { 
@@ -138,7 +138,7 @@ export default function ItemDrawer({
       color: '#3b82f6',
       contentType: 'TEXT' as const,
       proOnly: false
-    } as any;
+    } as ItemType;
     const updatedData = {
       id: item?.id || `item-${Date.now()}`,
       title,

@@ -80,6 +80,7 @@ export default function WorkspaceShellClient({ children }: { children: React.Rea
 
       {/* Collection Creation Modal */}
       <CollectionModal 
+        key={selectedCollection?.id || (isCollectionModalOpen ? 'open' : 'closed')}
         isOpen={isCollectionModalOpen}
         onClose={() => setIsCollectionModalOpen(false)}
         onSave={handleSaveCollection}

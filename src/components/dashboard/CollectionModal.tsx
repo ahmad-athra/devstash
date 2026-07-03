@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Collection } from '@/types/dashboard';
 import { useDashboardContext } from '@/context/DashboardContext';
 import { X, Save, FolderOpen, Star } from 'lucide-react';
@@ -9,7 +9,7 @@ import { DynamicIcon } from './DynamicIcon';
 interface CollectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (collection: any, onSuccess?: () => void) => void;
+  onSave: (collection: Collection, onSuccess?: () => void) => void;
   collection: Collection | null; // null if creating
 }
 
@@ -20,24 +20,10 @@ export default function CollectionModal({
   collection,
 }: CollectionModalProps) {
   const { itemTypes } = useDashboardContext();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [defaultTypeId, setDefaultTypeId] = useState('type-snippet');
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  useEffect(() => {
-    if (collection) {
-      setName(collection.name);
-      setDescription(collection.description || '');
-      setDefaultTypeId(collection.defaultTypeId || 'type-snippet');
-      setIsFavorite(collection.isFavorite);
-    } else {
-      setName('');
-      setDescription('');
-      setDefaultTypeId('type-snippet');
-      setIsFavorite(false);
-    }
-  }, [collection, isOpen]);
+  const [name, setName] = useState(collection?.name || '');
+  const [description, setDescription] = useState(collection?.description || '');
+  const [defaultTypeId, setDefaultTypeId] = useState(collection?.defaultTypeId || 'type-snippet');
+  const [isFavorite, setIsFavorite] = useState(collection?.isFavorite || false);
 
   if (!isOpen) return null;
 

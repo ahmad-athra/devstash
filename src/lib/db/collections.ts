@@ -1,6 +1,6 @@
 import { prisma } from '../prisma';
-import { Collection } from '@/types/dashboard';
-import { mapItem } from '../utils';
+import { Collection, ContentType } from '@/types/dashboard';
+import { mapItemType } from '../utils';
 
 
 // Fetch all collections for the default demo user from the database
@@ -33,16 +33,6 @@ export async function getCollections(): Promise<Collection[]> {
           item: {
             include: {
               itemType: true,
-              tags: {
-                include: {
-                  tag: true,
-                },
-              },
-              collections: {
-                include: {
-                  collection: true,
-                },
-              },
             },
           },
         },
@@ -54,7 +44,28 @@ export async function getCollections(): Promise<Collection[]> {
   });
 
   return dbCollections.map((col) => {
-    const items = col.items.map((ci) => mapItem(ci.item));
+    const items = col.items.map((ci) => {
+      const dbItem = ci.item;
+      return {
+        id: dbItem.id,
+        title: dbItem.title,
+        description: dbItem.description || undefined,
+        contentType: dbItem.contentType as ContentType,
+        content: dbItem.content || undefined,
+        url: dbItem.url || undefined,
+        fileUrl: dbItem.fileUrl || undefined,
+        fileName: dbItem.fileName || undefined,
+        fileSize: dbItem.fileSize || undefined,
+        language: dbItem.language || undefined,
+        isFavorite: dbItem.isFavorite,
+        isPinned: dbItem.isPinned,
+        itemType: mapItemType(dbItem.itemType),
+        tags: [],
+        collections: [],
+        createdAt: dbItem.createdAt.toISOString(),
+        updatedAt: dbItem.updatedAt.toISOString(),
+      };
+    });
     
     // Resolve defaultTypeId cuid to 'type-name' format
     const defaultType = col.defaultTypeId ? typeMap.get(col.defaultTypeId) : null;

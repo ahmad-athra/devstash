@@ -49,8 +49,47 @@ export function mapProOnly(typeName: string): boolean {
   return lower === 'file' || lower === 'image';
 }
 
+interface DbItemType {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  isSystem: boolean;
+  userId: string | null;
+}
+
+interface DbItem {
+  id: string;
+  title: string;
+  description: string | null;
+  contentType: string;
+  content: string | null;
+  url: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileSize: number | null;
+  language: string | null;
+  isFavorite: boolean;
+  isPinned: boolean;
+  itemType: DbItemType;
+  tags: {
+    tag: {
+      id: string;
+      name: string;
+    };
+  }[];
+  collections: {
+    collection: {
+      id: string;
+      name: string;
+    };
+  }[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Helper to map DB ItemType to UI ItemType
-export function mapItemType(dbType: any): ItemType {
+export function mapItemType(dbType: DbItemType): ItemType {
   return {
     id: `type-${dbType.name.toLowerCase()}`,
     name: dbType.name,
@@ -62,7 +101,7 @@ export function mapItemType(dbType: any): ItemType {
 }
 
 // Helper to map DB Item to UI Item
-export function mapItem(dbItem: any): Item {
+export function mapItem(dbItem: DbItem): Item {
   return {
     id: dbItem.id,
     title: dbItem.title,
@@ -77,11 +116,11 @@ export function mapItem(dbItem: any): Item {
     isFavorite: dbItem.isFavorite,
     isPinned: dbItem.isPinned,
     itemType: mapItemType(dbItem.itemType),
-    tags: dbItem.tags.map((t: any) => ({
+    tags: dbItem.tags.map((t) => ({
       id: t.tag.id,
       name: t.tag.name,
     })),
-    collections: dbItem.collections.map((c: any) => ({
+    collections: dbItem.collections.map((c) => ({
       id: c.collection.id,
       name: c.collection.name,
     })),

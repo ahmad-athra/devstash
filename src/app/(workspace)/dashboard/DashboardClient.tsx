@@ -19,6 +19,7 @@ import { MOCK_USER } from '@/lib/mockData';
 import { DynamicIcon } from '@/components/dashboard/DynamicIcon';
 import { getCollectionThemeColor } from '@/lib/utils';
 import Link from 'next/link';
+import { Item } from '@/types/dashboard';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -29,7 +30,7 @@ import {
 } from '@/components/ui/breadcrumb';
 
 interface DashboardItemCardProps {
-  item: any;
+  item: Item;
   type: 'pinned' | 'favorite';
   onSelect: () => void;
   onToggleAction: (e: React.MouseEvent) => void;

@@ -180,6 +180,7 @@ model ItemsOnCollections {
   addedAt      DateTime   @default(now())
 
   @@id([itemId, collectionId])
+  @@index([collectionId])
   @@map("items_on_collections")
 }
 
@@ -199,5 +200,6 @@ model TagsOnItems {
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([itemId, tagId])
+  @@index([tagId])
   @@map("tags_on_items")
 }
