@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "mcp-server-neon": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.neon.tech/sse",
+        "--header",
+        "Authorization: Bearer napi_sjpmm086momsmbq1751izspgi08c0zr0wi3axa6aiv4s9mqa7k7auacr7w8aeso6"
+      ],
+      "env": {}
+    },
+    // "neon": {
+    //   "serverUrl": "https://mcp.neon.tech/mcp"
+    // },
+    "context7": {
+      "serverUrl": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-fb407978-2786-4c36-92e6-a3a6da7a8843"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}

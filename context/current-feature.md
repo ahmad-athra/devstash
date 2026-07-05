@@ -1,14 +1,13 @@
 # Current Feature
 
-None
-
 ## Status
 
 Not Started
 
 ## Goals
 
-None
+## Notes
+
 
 ## History
 
@@ -24,3 +23,4 @@ None
 - **Stats & Sidebar**: Fetched and displayed system item types dynamically from the PostgreSQL database in the sidebar, replacing `MOCK_ITEM_TYPES`. Integrated a new database helper `src/lib/db/itemType.ts` to query system types, passing them to layout and context state. Configured the recent collections list in the sidebar to render colored indicator circles (representing the dominant item type color in the folder) instead of folder icons, and added a "View all collections" link. Created dedicated route pages (`/collections`) to show all database-driven collection cards, and cleaned up mock collections breadcrumb resolution.
 - **Sidebar Item Counts**: Implemented dynamic real-time item count badges next to the primary filters (Dashboard Home, Favorites), item types, and collections (Favorite Collections, Recent Collections) in the sidebar. Refactored the item type navigation links with custom left-border highlights using CSS variables (`--type-color`) and `color-mix` to focus on hover/selection. Removed icon background containers for a cleaner direct rendering. Replaced the checkmark pro icon with an inline colored `"PRO"` text label placed left of the count badge, while supporting collapsible toggle hiding.
 - **Database Optimization & Codebase Cleanup**: Resolved N+1 nested queries inside collections loading routines, added missing database indexes to join tables `ItemsOnCollections` and `TagsOnItems` via Prisma migrations, resolved React hooks useEffect cascading render warning, cleaned up build-time migration trigger execution from webpack, and cleared TypeScript `any` linter compilation failures.
+- **Auth Setup - NextAuth + GitHub Provider**: Installed NextAuth v5 and @auth/prisma-adapter, set up split auth config for edge compatibility, added GitHub provider, protected dashboard routes using Next.js proxy, and configured auth endpoints and session types.
