@@ -6,7 +6,11 @@ Not Started
 
 ## Goals
 
+
+
 ## Notes
+
+
 
 
 ## History
@@ -24,3 +28,4 @@ Not Started
 - **Sidebar Item Counts**: Implemented dynamic real-time item count badges next to the primary filters (Dashboard Home, Favorites), item types, and collections (Favorite Collections, Recent Collections) in the sidebar. Refactored the item type navigation links with custom left-border highlights using CSS variables (`--type-color`) and `color-mix` to focus on hover/selection. Removed icon background containers for a cleaner direct rendering. Replaced the checkmark pro icon with an inline colored `"PRO"` text label placed left of the count badge, while supporting collapsible toggle hiding.
 - **Database Optimization & Codebase Cleanup**: Resolved N+1 nested queries inside collections loading routines, added missing database indexes to join tables `ItemsOnCollections` and `TagsOnItems` via Prisma migrations, resolved React hooks useEffect cascading render warning, cleaned up build-time migration trigger execution from webpack, and cleared TypeScript `any` linter compilation failures.
 - **Auth Setup - NextAuth + GitHub Provider**: Installed NextAuth v5 and @auth/prisma-adapter, set up split auth config for edge compatibility, added GitHub provider, protected dashboard routes using Next.js proxy, and configured auth endpoints and session types.
+- **Auth Credentials - Email/Password Provider**: Configured NextAuth Credentials provider using the split pattern (edge-compatible configuration in `auth.config.ts` and database verification override in `auth.ts` using `bcryptjs`) and implemented a custom user registration route at `/api/auth/register` with robust request validation.
