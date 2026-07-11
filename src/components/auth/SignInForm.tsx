@@ -20,6 +20,13 @@ export default function SignInForm() {
     // Check if the user was redirected here after registering
     if (searchParams.get('registered') === 'true') {
       setSuccess('Account created successfully! Please sign in.');
+    } else if (searchParams.get('verify') === 'sent') {
+      const emailParam = searchParams.get('email');
+      setSuccess(
+        `Verification email sent${emailParam ? ` to ${emailParam}` : ''}! Please check your inbox to activate your account.`
+      );
+    } else if (searchParams.get('verified') === 'true') {
+      setSuccess('Email verified successfully! You can now sign in.');
     }
   }, [searchParams]);
 
@@ -50,7 +57,11 @@ export default function SignInForm() {
       });
 
       if (res?.error) {
-        setError('Invalid email or password.');
+        if (res.error === 'email_not_verified' || res.error.includes('email_not_verified') || res.error.includes('EmailNotVerified')) {
+          setError('Please verify your email address. A verification link was sent to your email.');
+        } else {
+          setError('Invalid email or password.');
+        }
       } else {
         router.push('/dashboard');
         router.refresh();

@@ -61,7 +61,7 @@ export default function RegisterForm() {
       if (!res.ok) {
         setError(data.error || 'Registration failed.');
       } else {
-        router.push('/sign-in?registered=true');
+        router.push(`/sign-in?verify=sent&email=${encodeURIComponent(email.toLowerCase().trim())}`);
       }
     } catch (err) {
       console.error('Registration error:', err);

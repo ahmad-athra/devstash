@@ -11,7 +11,6 @@ Not Started
 ## Notes
 
 
-
 ## History
 
 - **Dashboard UI Phase 1**: Initial layout and ShadCN UI components integration.
@@ -29,3 +28,4 @@ Not Started
 - **Auth Setup - NextAuth + GitHub Provider**: Installed NextAuth v5 and @auth/prisma-adapter, set up split auth config for edge compatibility, added GitHub provider, protected dashboard routes using Next.js proxy, and configured auth endpoints and session types.
 - **Auth Credentials - Email/Password Provider**: Configured NextAuth Credentials provider using the split pattern (edge-compatible configuration in `auth.config.ts` and database verification override in `auth.ts` using `bcryptjs`) and implemented a custom user registration route at `/api/auth/register` with robust request validation.
 - **Auth UI - Sign In, Register & Sign Out**: Implemented custom Sign In and Register pages with form validation, a reusable avatar initials component, sidebar footer user details display, and a dropdown profile menu with functioning logout.
+- **Email Verification on Register**: Integrated Resend API for email transmission, created verification token database utilities, updated registration endpoints, restricted unverified logins, and created verification confirmation and resend pages.

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,10 +68,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 8. Return success response (excluding password)
+    // 8. Generate and send verification email
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = req.headers.get("x-forwarded-proto") || "http";
+    const baseUrl = `${protocol}://${host}`;
+
+    const token = await generateVerificationToken(user.email);
+    await sendVerificationEmail(user.email, token.token, baseUrl);
+
+    // 9. Return success response (excluding password)
     return NextResponse.json(
       {
-        message: "User registered successfully.",
+        message: "User registered successfully. Please check your email to verify your account.",
+        requiresVerification: true,
         user: {
           id: user.id,
           name: user.name,
