@@ -4,24 +4,37 @@ import WorkspaceShellClient from './WorkspaceShellClient';
 import { getCollections } from '@/lib/db/collections';
 import { getItems } from '@/lib/db/items';
 import { getItemTypes } from '@/lib/db/itemType';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { SessionProvider } from 'next-auth/react';
 
 export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect('/sign-in');
+  }
+
+  const userId = session.user.id;
+
   const [collections, items, itemTypes] = await Promise.all([
-    getCollections(),
-    getItems(),
+    getCollections(userId),
+    getItems(userId),
     getItemTypes(),
   ]);
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-500 font-mono">Loading workspace...</div>}>
-      <DashboardProvider 
-        initialCollections={collections} 
-        initialItems={items}
-        initialItemTypes={itemTypes}
-      >
-        <WorkspaceShellClient>{children}</WorkspaceShellClient>
-      </DashboardProvider>
-    </Suspense>
+    <SessionProvider session={session}>
+      <Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-500 font-mono">Loading workspace...</div>}>
+        <DashboardProvider 
+          initialCollections={collections} 
+          initialItems={items}
+          initialItemTypes={itemTypes}
+        >
+          <WorkspaceShellClient>{children}</WorkspaceShellClient>
+        </DashboardProvider>
+      </Suspense>
+    </SessionProvider>
   );
 }
 

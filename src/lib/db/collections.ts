@@ -3,19 +3,25 @@ import { Collection, ContentType } from '@/types/dashboard';
 import { mapItemType } from '../utils';
 
 
-// Fetch all collections for the default demo user from the database
-export async function getCollections(): Promise<Collection[]> {
-  // Find the seeded demo user
-  let user = await prisma.user.findUnique({
-    where: { email: 'demo@devstash.io' },
-  });
+// Fetch all collections for the specified user (or default demo user) from the database
+export async function getCollections(userId?: string): Promise<Collection[]> {
+  let targetUserId = userId;
 
-  if (!user) {
-    // Fallback to first user in the database if demo user doesn't exist
-    user = await prisma.user.findFirst();
+  if (!targetUserId) {
+    // Find the seeded demo user
+    let user = await prisma.user.findUnique({
+      where: { email: 'demo@devstash.io' },
+    });
+
+    if (!user) {
+      // Fallback to first user in the database if demo user doesn't exist
+      user = await prisma.user.findFirst();
+    }
+    
+    targetUserId = user?.id;
   }
 
-  if (!user) {
+  if (!targetUserId) {
     return [];
   }
 
@@ -25,7 +31,7 @@ export async function getCollections(): Promise<Collection[]> {
 
   const dbCollections = await prisma.collection.findMany({
     where: {
-      userId: user.id,
+      userId: targetUserId,
     },
     include: {
       items: {

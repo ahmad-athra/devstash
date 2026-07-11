@@ -41,7 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
-. g e m i n i /  
+.gemini/  
 
 # agents
 .agents/mcp_config.json

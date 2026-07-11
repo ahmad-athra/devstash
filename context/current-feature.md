@@ -12,7 +12,6 @@ Not Started
 
 
 
-
 ## History
 
 - **Dashboard UI Phase 1**: Initial layout and ShadCN UI components integration.
@@ -29,3 +28,4 @@ Not Started
 - **Database Optimization & Codebase Cleanup**: Resolved N+1 nested queries inside collections loading routines, added missing database indexes to join tables `ItemsOnCollections` and `TagsOnItems` via Prisma migrations, resolved React hooks useEffect cascading render warning, cleaned up build-time migration trigger execution from webpack, and cleared TypeScript `any` linter compilation failures.
 - **Auth Setup - NextAuth + GitHub Provider**: Installed NextAuth v5 and @auth/prisma-adapter, set up split auth config for edge compatibility, added GitHub provider, protected dashboard routes using Next.js proxy, and configured auth endpoints and session types.
 - **Auth Credentials - Email/Password Provider**: Configured NextAuth Credentials provider using the split pattern (edge-compatible configuration in `auth.config.ts` and database verification override in `auth.ts` using `bcryptjs`) and implemented a custom user registration route at `/api/auth/register` with robust request validation.
+- **Auth UI - Sign In, Register & Sign Out**: Implemented custom Sign In and Register pages with form validation, a reusable avatar initials component, sidebar footer user details display, and a dropdown profile menu with functioning logout.
