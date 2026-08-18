@@ -60,11 +60,14 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 7. Create user in database
+    const requireEmailVerification = process.env.REQUIRE_EMAIL_VERIFICATION !== "false";
+    
     const user = await prisma.user.create({
       data: {
         name,
         email: normalizedEmail,
         password: hashedPassword,
+        ...(requireEmailVerification ? {} : { emailVerified: new Date() }),
       },
     });
 
@@ -73,14 +76,18 @@ export async function POST(req: NextRequest) {
     const protocol = req.headers.get("x-forwarded-proto") || "http";
     const baseUrl = `${protocol}://${host}`;
 
-    const token = await generateVerificationToken(user.email);
-    await sendVerificationEmail(user.email, token.token, baseUrl);
+    if (requireEmailVerification) {
+      const token = await generateVerificationToken(user.email);
+      await sendVerificationEmail(user.email, token.token, baseUrl);
+    }
 
     // 9. Return success response (excluding password)
     return NextResponse.json(
       {
-        message: "User registered successfully. Please check your email to verify your account.",
-        requiresVerification: true,
+        message: requireEmailVerification 
+          ? "User registered successfully. Please check your email to verify your account."
+          : "User registered successfully.",
+        requiresVerification: requireEmailVerification,
         user: {
           id: user.id,
           name: user.name,

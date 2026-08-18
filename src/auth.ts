@@ -42,7 +42,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const passwordsMatch = await bcrypt.compare(password, user.password);
         if (!passwordsMatch) return null;
 
-        if (!user.emailVerified) {
+        const requireEmailVerification = process.env.REQUIRE_EMAIL_VERIFICATION !== "false";
+        if (requireEmailVerification && !user.emailVerified) {
           throw new EmailNotVerifiedError();
         }
         
