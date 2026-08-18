@@ -6,10 +6,7 @@ Not Started
 
 ## Goals
 
-
-
 ## Notes
-
 
 ## History
 
@@ -30,3 +27,4 @@ Not Started
 - **Auth UI - Sign In, Register & Sign Out**: Implemented custom Sign In and Register pages with form validation, a reusable avatar initials component, sidebar footer user details display, and a dropdown profile menu with functioning logout.
 - **Email Verification on Register**: Integrated Resend API for email transmission, created verification token database utilities, updated registration endpoints, restricted unverified logins, and created verification confirmation and resend pages.
 - **Toggle Email Verification**: Added an environment variable (`REQUIRE_EMAIL_VERIFICATION`) to toggle email verification requirement during registration and login. Updated `RegisterForm.tsx` to conditionally redirect to sign-in with a success message when email verification is disabled.
+- **Forgot Password**: Reused the `VerificationToken` model to build a full forgot password and reset password flow, including dedicated UI forms and routes (`/forgot-password` and `/reset-password`), integration with Resend API for custom HTML emails, and dynamic query param redirection routing upon success.
