@@ -50,6 +50,7 @@ export interface ConfirmDialogState {
   confirmText?: string;
   cancelText?: string;
   isDestructive?: boolean;
+  verificationText?: string;
   onConfirm: () => void;
 }
 

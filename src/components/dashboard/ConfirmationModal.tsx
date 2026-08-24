@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDashboardContext } from '@/context/DashboardContext';
 import { AlertTriangle, CheckCircle, X, Pin, Star } from 'lucide-react';
 
 export default function ConfirmationModal() {
   const { confirmDialog, closeConfirm } = useDashboardContext();
+  const [verifyText, setVerifyText] = useState('');
+
+  // Reset input when modal opens
+  useEffect(() => {
+    if (confirmDialog?.isOpen) {
+      setVerifyText('');
+    }
+  }, [confirmDialog?.isOpen]);
 
   // Close on Escape key press
   useEffect(() => {
@@ -40,6 +48,10 @@ export default function ConfirmationModal() {
   const isBlue = titleLower.includes('pin') && !titleLower.includes('unpin');
   
   const isYellow = titleLower.includes('favorite') && !titleLower.includes('unfavorite');
+
+  const isConfirmDisabled = Boolean(
+    confirmDialog.verificationText && verifyText !== confirmDialog.verificationText
+  );
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
@@ -85,6 +97,20 @@ export default function ConfirmationModal() {
               <p className="text-xs text-zinc-400 leading-relaxed break-words">
                 {message}
               </p>
+              {confirmDialog.verificationText && (
+                <div className="pt-3">
+                  <p className="text-xs text-zinc-500 mb-1.5">
+                    To confirm, type <strong className="text-zinc-300 font-mono select-all">"{confirmDialog.verificationText}"</strong> below:
+                  </p>
+                  <input
+                    type="text"
+                    value={verifyText}
+                    onChange={(e) => setVerifyText(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all font-mono"
+                    placeholder={confirmDialog.verificationText}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Close Cross icon */}
@@ -108,15 +134,18 @@ export default function ConfirmationModal() {
           </button>
           <button
             type="button"
+            disabled={isConfirmDisabled}
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-[0.98] cursor-pointer select-none ${
-              isRed
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md select-none ${
+              isConfirmDisabled 
+                ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500'
+                : 'cursor-pointer active:scale-[0.98] ' + (isRed
                 ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-500/10'
                 : isBlue
                 ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/10'
                 : isYellow
                 ? 'bg-yellow-500 hover:bg-yellow-400 text-zinc-950 shadow-yellow-500/10'
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/10'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/10')
             }`}
           >
             {confirmText}

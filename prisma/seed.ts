@@ -57,6 +57,37 @@ async function main() {
     return found.id;
   };
 
+  // 1.5 Seed Tier Limits
+  console.log("-> Seeding system tier limits...");
+  const TIER_LIMITS = [
+    {
+      tier: "FREE",
+      maxItems: 50,
+      maxCollections: 3,
+      fileUpload: false,
+      aiFeatures: false,
+      customTypes: false,
+      exportData: false,
+    },
+    {
+      tier: "PRO",
+      maxItems: -1,
+      maxCollections: -1,
+      fileUpload: true,
+      aiFeatures: true,
+      customTypes: true,
+      exportData: true,
+    }
+  ];
+
+  for (const limit of TIER_LIMITS) {
+    await prisma.systemTierLimit.upsert({
+      where: { tier: limit.tier },
+      update: limit,
+      create: limit,
+    });
+  }
+
   // 2. Seed Demo User
   console.log("-> Seeding Demo User...");
   const hashedPassword = await bcrypt.hash("12345678", 12);

@@ -41,7 +41,7 @@ export default function ItemDrawer({
   onDelete,
   proMode,
 }: ItemDrawerProps) {
-  const { itemTypes } = useDashboardContext();
+  const { itemTypes, collections } = useDashboardContext();
   const typeMap = useMemo(() => {
     return new Map(itemTypes.map(t => [t.name.toLowerCase(), t]));
   }, [itemTypes]);
@@ -60,6 +60,7 @@ export default function ItemDrawer({
   const [isPinned, setIsPinned] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedCollections, setSelectedCollections] = useState<{id: string, name: string}[]>([]);
   const [language, setLanguage] = useState<string>('plaintext');
 
   // AI Simulations states
@@ -85,6 +86,7 @@ export default function ItemDrawer({
       setIsFavorite(item.isFavorite);
       setIsPinned(item.isPinned);
       setTags(item.tags);
+      setSelectedCollections(item.collections || []);
       setLanguage(item.language || 'plaintext');
       setActiveTab('view');
     } else {
@@ -100,6 +102,7 @@ export default function ItemDrawer({
       setIsFavorite(false);
       setIsPinned(false);
       setTags([]);
+      setSelectedCollections([]);
       setLanguage('plaintext');
       setActiveTab('edit'); // open directly to edit for new items
     }
@@ -153,7 +156,7 @@ export default function ItemDrawer({
       isPinned,
       itemType: selectedType,
       tags,
-      collections: item?.collections || [],
+      collections: selectedCollections,
       createdAt: item?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -735,6 +738,38 @@ export default function ItemDrawer({
                   />
                 </div>
               </div>
+
+              {/* Collections Selector */}
+              {collections.length > 0 && (
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Collections</label>
+                  <div className="flex flex-wrap gap-2">
+                    {collections.map((col) => {
+                      const isSelected = selectedCollections.some(sc => sc.id === col.id);
+                      return (
+                        <button
+                          key={col.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedCollections(prev => prev.filter(sc => sc.id !== col.id));
+                            } else {
+                              setSelectedCollections(prev => [...prev, { id: col.id, name: col.name }]);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                            isSelected 
+                              ? 'bg-blue-600/20 border-blue-500/50 text-blue-400' 
+                              : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+                          }`}
+                        >
+                          {col.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

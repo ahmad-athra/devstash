@@ -6,7 +6,11 @@ Not Started
 
 ## Goals
 
+- [List your goals here]
+
 ## Notes
+
+- [Add any notes, constraints, or references here]
 
 ## History
 
@@ -28,3 +32,4 @@ Not Started
 - **Email Verification on Register**: Integrated Resend API for email transmission, created verification token database utilities, updated registration endpoints, restricted unverified logins, and created verification confirmation and resend pages.
 - **Toggle Email Verification**: Added an environment variable (`REQUIRE_EMAIL_VERIFICATION`) to toggle email verification requirement during registration and login. Updated `RegisterForm.tsx` to conditionally redirect to sign-in with a success message when email verification is disabled.
 - **Forgot Password**: Reused the `VerificationToken` model to build a full forgot password and reset password flow, including dedicated UI forms and routes (`/forgot-password` and `/reset-password`), integration with Resend API for custom HTML emails, and dynamic query param redirection routing upon success.
+- **Profile Page & Tier Limits**: Implemented a comprehensive `/profile` page to view account details, change passwords, and permanently delete accounts with strict phrase-based confirmation and farewell emails via Resend. Migrated tier limits (e.g., Free vs Pro) to a newly created Prisma model (`SystemTierLimit`) to allow future admin panel configuration. Computed and rendered dynamic real-time percentage progress bars for usage statistics depending on tier limits, displaying "∞" for unlimited capacities. Included a stylish responsive UI with a premium banner.

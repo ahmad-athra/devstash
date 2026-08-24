@@ -203,3 +203,22 @@ model TagsOnItems {
   @@index([tagId])
   @@map("tags_on_items")
 }
+
+// ─────────────────────────────────────────────
+// SYSTEM CONFIGURATION
+// ─────────────────────────────────────────────
+
+model SystemTierLimit {
+  id              String   @id @default(cuid())
+  tier            String   @unique // "FREE" or "PRO"
+  maxItems        Int      // 50 for FREE, -1 for Infinity
+  maxCollections  Int      // 3 for FREE, -1 for Infinity
+  fileUpload      Boolean
+  aiFeatures      Boolean
+  customTypes     Boolean
+  exportData      Boolean
+  
+  updatedAt       DateTime @updatedAt
+
+  @@map("system_tier_limits")
+}

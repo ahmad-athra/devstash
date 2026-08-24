@@ -121,3 +121,50 @@ export async function sendPasswordResetEmail(email: string, token: string, baseU
     return { success: false, error };
   }
 }
+
+/**
+ * Sends an account deletion confirmation email to the user.
+ */
+export async function sendAccountDeletionEmail(email: string) {
+  if (!resend) {
+    console.error("Resend is not initialized. Cannot send account deletion email.");
+    return;
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: "DevStash <onboarding@resend.dev>",
+      to: email,
+      subject: "Your DevStash account has been deleted",
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #09090b; padding: 40px 20px; text-align: center; color: #f4f4f5; border-radius: 12px; max-width: 560px; margin: 0 auto; border: 1px solid #27272a;">
+          <div style="margin-bottom: 24px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2563eb, #7c3aed); width: 48px; height: 48px; border-radius: 10px; margin: 0 auto 12px auto; text-align: center;">
+              <span style="color: #ffffff; font-size: 24px; font-weight: bold; line-height: 48px; display: block; width: 100%;">D</span>
+            </div>
+            <h1 style="font-size: 22px; font-weight: 800; letter-spacing: 0.05em; margin: 0; color: #ffffff;">DevStash</h1>
+            <p style="font-size: 9px; font-family: monospace; color: #71717a; text-transform: uppercase; letter-spacing: 0.15em; margin: 4px 0 0 0;">Developer Knowledge Cockpit</p>
+          </div>
+          
+          <div style="background-color: #18181b; border: 1px solid #27272a; padding: 32px; border-radius: 8px; margin-bottom: 24px; text-align: left;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #ef4444; margin-top: 0; margin-bottom: 12px; text-align: left;">Account Deleted</h2>
+            <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 24px; text-align: left;">
+              We're sorry to see you go. This email confirms that your DevStash account and all associated data have been permanently deleted as requested.
+            </p>
+            <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px; text-align: left;">
+              If you ever decide to come back, we'll be here. 
+            </p>
+          </div>
+          
+          <div style="text-align: center; font-size: 11px; color: #52525b;">
+            <p style="margin: 0;">&copy; ${new Date().getFullYear()} DevStash. All rights reserved.</p>
+          </div>
+        </div>
+      `,
+    });
+    return { success: true, data };
+  } catch (error) {
+    console.error("Failed to send account deletion email:", error);
+    return { success: false, error };
+  }
+}
