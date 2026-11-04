@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { Mail, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function ForgotPasswordForm() {
@@ -34,14 +35,18 @@ export default function ForgotPasswordForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to request password reset.');
+        const errMsg = data.error || 'Failed to request password reset.';
+        setError(errMsg);
+        toast.error(errMsg);
       } else {
         setSuccess(data.message || 'If an account with that email exists, we\'ve sent a password reset link.');
         setEmail('');
       }
     } catch (err) {
       console.error('Forgot password error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      const unexpectedMsg = 'An unexpected error occurred. Please try again.';
+      setError(unexpectedMsg);
+      toast.error(unexpectedMsg);
     } finally {
       setLoading(false);
     }

@@ -1,24 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Mail, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 
 function ResendForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => searchParams.get("email") || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  useEffect(() => {
-    const emailParam = searchParams.get("email");
-    if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +44,9 @@ function ResendForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to resend verification link.");
+        const errMsg = data.error || "Failed to resend verification link.";
+        setError(errMsg);
+        toast.error(errMsg);
       } else {
         setSuccess("A new verification link has been sent to your email.");
         // Redirect to sign in page after 3 seconds
@@ -60,7 +56,9 @@ function ResendForm() {
       }
     } catch (err) {
       console.error("Resend error:", err);
-      setError("An unexpected error occurred. Please try again.");
+      const unexpectedMsg = "An unexpected error occurred. Please try again.";
+      setError(unexpectedMsg);
+      toast.error(unexpectedMsg);
     } finally {
       setLoading(false);
     }

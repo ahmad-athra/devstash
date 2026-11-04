@@ -4,31 +4,57 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { toast } from 'sonner';
 import { Mail, Lock, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+
+function getInitialBannerMessage(searchParams: ReturnType<typeof useSearchParams>): {
+  success: string | null;
+  error: string | null;
+} {
+  if (searchParams.get('registered') === 'true') {
+    return { success: 'Account created successfully! Please sign in.', error: null };
+  }
+  if (searchParams.get('verify') === 'sent') {
+    const emailParam = searchParams.get('email');
+    return {
+      success: `Verification email sent${emailParam ? ` to ${emailParam}` : ''}! Please check your inbox to activate your account.`,
+      error: null,
+    };
+  }
+  if (searchParams.get('verified') === 'true') {
+    return { success: 'Email verified successfully! You can now sign in.', error: null };
+  }
+  if (searchParams.get('reset') === 'success') {
+    return {
+      success: 'Password updated successfully! You can now sign in with your new password.',
+      error: null,
+    };
+  }
+  if (searchParams.get('error') === 'RateLimitExceeded') {
+    return {
+      success: null,
+      error: searchParams.get('code') || 'Too many attempts. Please try again later.',
+    };
+  }
+  return { success: null, error: null };
+}
 
 export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const initialBanner = getInitialBannerMessage(searchParams);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialBanner.error);
+  const [success, setSuccess] = useState<string | null>(initialBanner.success);
 
   useEffect(() => {
-    // Check if the user was redirected here after registering
-    if (searchParams.get('registered') === 'true') {
-      setSuccess('Account created successfully! Please sign in.');
-    } else if (searchParams.get('verify') === 'sent') {
-      const emailParam = searchParams.get('email');
-      setSuccess(
-        `Verification email sent${emailParam ? ` to ${emailParam}` : ''}! Please check your inbox to activate your account.`
-      );
-    } else if (searchParams.get('verified') === 'true') {
-      setSuccess('Email verified successfully! You can now sign in.');
-    } else if (searchParams.get('reset') === 'success') {
-      setSuccess('Password updated successfully! You can now sign in with your new password.');
+    if (searchParams.get('error') === 'RateLimitExceeded') {
+      const codeMsg = searchParams.get('code') || 'Too many attempts. Please try again later.';
+      toast.error(codeMsg);
     }
   }, [searchParams]);
 
@@ -59,10 +85,23 @@ export default function SignInForm() {
       });
 
       if (res?.error) {
-        if (res.error === 'email_not_verified' || res.error.includes('email_not_verified') || res.error.includes('EmailNotVerified')) {
-          setError('Please verify your email address. A verification link was sent to your email.');
+        if (res.status === 429 || res.error === 'RateLimitExceeded') {
+          const rateLimitMsg = res.code || 'Too many attempts. Please try again later.';
+          setError(rateLimitMsg);
+          toast.error(rateLimitMsg);
+        } else if (
+          res.error === 'email_not_verified' ||
+          res.error.includes('email_not_verified') ||
+          res.error.includes('EmailNotVerified') ||
+          res.code === 'email_not_verified'
+        ) {
+          const verifyMsg = 'Please verify your email address. A verification link was sent to your email.';
+          setError(verifyMsg);
+          toast.error(verifyMsg);
         } else {
-          setError('Invalid email or password.');
+          const invalidMsg = 'Invalid email or password.';
+          setError(invalidMsg);
+          toast.error(invalidMsg);
         }
       } else {
         router.push('/dashboard');
@@ -70,7 +109,9 @@ export default function SignInForm() {
       }
     } catch (err) {
       console.error('Sign in error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      const unexpectedMsg = 'An unexpected error occurred. Please try again.';
+      setError(unexpectedMsg);
+      toast.error(unexpectedMsg);
     } finally {
       setLoading(false);
     }
@@ -85,7 +126,9 @@ export default function SignInForm() {
       await signIn('github', { callbackUrl: '/dashboard' });
     } catch (err) {
       console.error('Github auth error:', err);
-      setError('GitHub authentication failed.');
+      const githubErrMsg = 'GitHub authentication failed.';
+      setError(githubErrMsg);
+      toast.error(githubErrMsg);
       setGithubLoading(false);
     }
   };

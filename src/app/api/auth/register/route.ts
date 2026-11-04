@@ -3,9 +3,21 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  getClientIp,
+  getRateLimitKey,
+} from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateLimit = await checkRateLimit("register", getRateLimitKey(ip));
+    if (!rateLimit.success) {
+      return createRateLimitResponse(rateLimit);
+    }
+
     const body = await req.json();
     const { name, email, password, confirmPassword } = body;
 

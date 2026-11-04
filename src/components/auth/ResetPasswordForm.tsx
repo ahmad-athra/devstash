@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { Lock, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function ResetPasswordForm() {
@@ -55,14 +56,18 @@ export default function ResetPasswordForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to reset password.');
+        const errMsg = data.error || 'Failed to reset password.';
+        setError(errMsg);
+        toast.error(errMsg);
       } else {
         // We can optionally set a success state, but navigating away is better.
         router.push('/sign-in?reset=success');
       }
     } catch (err) {
       console.error('Reset password error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      const unexpectedMsg = 'An unexpected error occurred. Please try again.';
+      setError(unexpectedMsg);
+      toast.error(unexpectedMsg);
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Mail, Lock, User, Loader2, AlertCircle } from 'lucide-react';
 
 export default function RegisterForm() {
@@ -59,7 +60,9 @@ export default function RegisterForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Registration failed.');
+        const errMsg = data.error || 'Registration failed.';
+        setError(errMsg);
+        toast.error(errMsg);
       } else {
         if (data.requiresVerification === false) {
           router.push(`/sign-in?registered=true&email=${encodeURIComponent(email.toLowerCase().trim())}`);
@@ -69,7 +72,9 @@ export default function RegisterForm() {
       }
     } catch (err) {
       console.error('Registration error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      const unexpectedMsg = 'An unexpected error occurred. Please try again.';
+      setError(unexpectedMsg);
+      toast.error(unexpectedMsg);
     } finally {
       setLoading(false);
     }

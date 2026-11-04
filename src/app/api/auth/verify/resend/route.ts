@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  getClientIp,
+  getRateLimitKey,
+} from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { email } = body;
 
-    if (!email) {
+    if (!email || typeof email !== "string") {
       return NextResponse.json(
         { error: "Email address is required." },
         { status: 400 }
@@ -16,6 +22,15 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    const ip = getClientIp(req);
+    const rateLimit = await checkRateLimit(
+      "resendVerification",
+      getRateLimitKey(ip, normalizedEmail)
+    );
+    if (!rateLimit.success) {
+      return createRateLimitResponse(rateLimit);
+    }
 
     // Check if the user exists in the database
     const user = await prisma.user.findUnique({
